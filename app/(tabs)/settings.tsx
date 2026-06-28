@@ -38,7 +38,7 @@ export default function SettingsScreen() {
     {
       icon: ASSETS.ICONS.USER_ICON,
       title: "Ontiver Pro",
-      onPress: () => router.push("/")
+      onPress: () => router.push("/settings/ontiver-pro" as any)
     },
     {
       icon: ASSETS.ICONS.USER_ICON,
@@ -49,6 +49,11 @@ export default function SettingsScreen() {
       icon: ASSETS.ICONS.USER_ICON,
       title: "About",
       onPress: () => router.push("/")
+    },
+    {
+      icon: ASSETS.ICONS.USER_ICON,
+      title: "KYC",
+      onPress: () => router.push("/(screens)/kyc" as any)
     },
   ]
 
@@ -123,8 +128,10 @@ export default function SettingsScreen() {
               title='Signout'
               textStyle={{ color: "rgba(156, 0, 0, 1)" }}
               style={{ backgroundColor: "rgba(255, 219, 219, 0.4)" }}
+              onPress={() => router.replace("/auth/splash")}
             />
           </View>}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </View>
