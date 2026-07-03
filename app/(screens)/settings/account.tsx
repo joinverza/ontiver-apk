@@ -8,7 +8,7 @@ import { Fonts } from "@/constants/fonts"
 import { ASSETS } from "@/utils/assets"
 import { useDesignSystem } from "@/utils/design-system"
 import { useState } from "react"
-import { ScrollView, TouchableOpacity, View } from "react-native"
+import { ScrollView, TouchableOpacity, View, Platform, KeyboardAvoidingView } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Accounts = () => {
@@ -21,7 +21,8 @@ const Accounts = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, paddingHorizontal: ds.space.xl, backgroundColor: "rgba(248, 250, 252, 1)" }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} style={{ flex: 1 }}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                 <AppHeader title="Account" />
                 <View style={{ marginTop: ds.space.xl }}>
                     <BodySmallText color={Colors.black}>Profile Information</BodySmallText>
@@ -103,6 +104,7 @@ const Accounts = () => {
                     <BodySmallText color={"rgba(156, 0, 0, 1)"}>Delete Account</BodySmallText>
                 </TouchableOpacity>
             </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

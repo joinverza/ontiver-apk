@@ -7,7 +7,7 @@ import Colors from "@/constants/Colors"
 import { Fonts } from "@/constants/fonts"
 import { useDesignSystem } from "@/utils/design-system"
 import { useState } from "react"
-import { ScrollView, View } from "react-native"
+import { ScrollView, View, Platform, KeyboardAvoidingView } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Security = () => {
@@ -20,7 +20,8 @@ const Security = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, paddingHorizontal: ds.space.xl, backgroundColor: "rgba(248, 250, 252, 1)" }}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: ds.space.lg }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} style={{ flex: 1 }}>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: ds.space.lg }}>
                 <AppHeader title="Security" />
                 <View style={{ padding: ds.space.md, borderRadius: ds.radius.lg, backgroundColor: Colors.white, gap: ds.space.sm }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -81,6 +82,7 @@ const Security = () => {
                     </View>
                 </View>
             </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

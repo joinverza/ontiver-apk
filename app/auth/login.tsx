@@ -5,8 +5,9 @@ import { BodySmallText, H1Text } from '@/components/shared/AppTexts';
 import { ASSETS } from '@/utils/assets';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { useDesignSystem } from '../../utils/design-system';
 
@@ -53,11 +54,13 @@ export default function CreateAccountScreen() {
         >
           <ASSETS.ICONS.ARROW_LEFT_WHITE />
         </TouchableOpacity>
-        <H1Text color={Colors.white}
-          style={{ flex: 1, textAlign: "center", paddingVertical: ds.space.xl }}
-        >
-          Log In
-        </H1Text>
+        <Animated.View entering={FadeInDown.duration(400)} style={{ flex: 1 }}>
+          <H1Text color={Colors.white}
+            style={{ textAlign: "center", paddingVertical: ds.space.xl }}
+          >
+            Log In
+          </H1Text>
+        </Animated.View>
         <View
           style={{
             height: ds.space['6xl'],
@@ -78,15 +81,16 @@ export default function CreateAccountScreen() {
         }}
       >
         <KeyboardAvoidingView
-          behavior='height'
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
-          keyboardVerticalOffset={100}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
         >
           <ScrollView showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               gap: ds.space.xl
             }}
           >
+            <Animated.View entering={FadeInDown.delay(100).duration(500)} style={{ gap: ds.space.xl }}>
             <AppInput
               label='Email Address'
               placeholder='yourname@email.com'
@@ -190,6 +194,7 @@ export default function CreateAccountScreen() {
                 New to Vault? <Text style={{ color: Colors.primary }}>Create Account</Text>
               </BodySmallText>
             </View>
+            </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>

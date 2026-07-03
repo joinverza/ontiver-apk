@@ -5,8 +5,9 @@ import { BodySmallText, H1Text } from '@/components/shared/AppTexts';
 import { ASSETS } from '@/utils/assets';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { useDesignSystem } from '../../utils/design-system';
 
@@ -36,11 +37,13 @@ export default function CreateAccountScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1Text color={Colors.white}
-        style={{ textAlign: "center", paddingVertical: ds.space.xl }}
-      >
-        Create Account
-      </H1Text>
+      <Animated.View entering={FadeInDown.duration(400)}>
+        <H1Text color={Colors.white}
+          style={{ textAlign: "center", paddingVertical: ds.space.xl }}
+        >
+          Create Account
+        </H1Text>
+      </Animated.View>
 
       <View
         style={{
@@ -52,15 +55,16 @@ export default function CreateAccountScreen() {
         }}
       >
         <KeyboardAvoidingView
-          behavior='height'
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
-          keyboardVerticalOffset={100}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
         >
           <ScrollView showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               gap: ds.space.xl
             }}
           >
+            <Animated.View entering={FadeInDown.delay(100).duration(500)} style={{ gap: ds.space.xl }}>
             <AppInput
               label='Full Name'
               placeholder='e.g. Adaeze Okonkwo'
@@ -177,6 +181,7 @@ export default function CreateAccountScreen() {
                 Already have an account? <Text style={{ color: Colors.primary }}>Log in</Text>
               </BodySmallText>
             </View>
+            </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>

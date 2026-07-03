@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import AppHeader from '../../components/shared/AppHeader';
 import { BodyLargeText, BodySmallText, H2Text, Label } from '../../components/shared/AppTexts';
 import Colors from '../../constants/Colors';
@@ -29,7 +30,7 @@ const lineData = [
 export default function PrivacyDashboard() {
     const ds = useDesignSystem();
     const router = useRouter();
-    const { top } = useSafeAreaInsets()
+    const { top, bottom } = useSafeAreaInsets()
 
     return (
         <View style={[styles.container, { backgroundColor: "rgba(248, 250, 252, 1)", paddingTop: top }]}>
@@ -37,7 +38,8 @@ export default function PrivacyDashboard() {
                 <AppHeader title="Privacy" />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: ds.space['4xl'], paddingHorizontal: ds.space.lg }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 140 + bottom, paddingHorizontal: ds.space.lg }}>
+                <Animated.View entering={FadeInDown.duration(500)}>
                 {/* Hero Card */}
                 <View style={[styles.heroCard, { borderRadius: ds.radius.xl, marginTop: ds.space.xl }]}>
                     {/* The dark bump behind the chart */}
@@ -214,7 +216,7 @@ export default function PrivacyDashboard() {
                         <BodyLargeText style={{ color: '#111827' }}>+10 pts</BodyLargeText>
                     </View>
                 </View>
-
+                </Animated.View>
             </ScrollView>
         </View>
     );

@@ -1,5 +1,6 @@
+import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { ASSETS } from '../../utils/assets';
@@ -50,14 +51,17 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.secondaryText,
         tabBarStyle: {
-          backgroundColor: Colors.white,
-          borderTopColor: Colors.grey200,
+          backgroundColor: 'transparent',
+          position: 'absolute',
+          borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
           height: ds.space['7xl'] + bottomInset,
           paddingBottom: ds.space.sm,
-          // height: ds.height + bottomInset,
         },
+        tabBarBackground: () => (
+          <BlurView intensity={1900} tint="light" style={StyleSheet.absoluteFill} />
+        ),
         tabBarLabelStyle: {
           fontFamily: ds.typography.micro.fontFamily,
           fontSize: ds.typography.micro.fontSize,

@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Dimensions, FlatList, ScrollView, TextInput, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppButton from '../../components/shared/AppButton';
 import { BodyLargeText, BodySmallText, H2Text } from '../../components/shared/AppTexts';
@@ -16,7 +17,7 @@ const { height } = Dimensions.get('window');
 export default function ShareScreen() {
     const ds = useDesignSystem();
     const [activeTab, setActiveTab] = useState('All');
-    const { top } = useSafeAreaInsets()
+    const { top, bottom } = useSafeAreaInsets()
 
     // Modal states
     const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -50,7 +51,7 @@ export default function ShareScreen() {
 
     const getStatusStyles = (status: string) => {
         if (status === 'Active') return { bg: 'rgba(208, 255, 221, 1)', text: 'rgba(0, 125, 33, 1)', border: 'rgba(0, 125, 33, 0.4)' };
-        if (status === 'Revoked') return { bg: '#E5E7EB', text: '#4B5563', border: '#D1D5DB' };
+        if (status === 'Revoked') return { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' };
         if (status === 'Denied') return { bg: 'rgba(255, 208, 209, 1)', text: 'rgba(125, 0, 2, 1)', border: 'rgba(125, 0, 2, 0.4)' };
         return { bg: Colors.white, text: Colors.mainText, border: Colors.mainText };
     };
@@ -58,7 +59,7 @@ export default function ShareScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: "rgba(248, 250, 252, 1)", paddingHorizontal: ds.space.lg, paddingTop: top }}>
             <View style={{ marginTop: ds.space.md, marginBottom: ds.space.lg, alignItems: 'center' }}>
-                <H2Text>Sharing History</H2Text>
+                <H2Text style={{ fontFamily: Fonts.bold }}>Sharing History</H2Text>
             </View>
 
             <View style={{ flex: 1 }}>
@@ -67,11 +68,16 @@ export default function ShareScreen() {
                     flexDirection: 'row',
                     alignItems: 'center',
                     backgroundColor: Colors.white,
-                    borderRadius: ds.radius.md,
+                    borderRadius: ds.radius.xl,
                     paddingHorizontal: ds.space.md,
                     borderColor: '#E5E7EB',
                     borderWidth: 1,
-                    marginBottom: ds.space.lg
+                    marginBottom: ds.space.lg,
+                    shadowColor: Colors.black,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 10,
+                    elevation: 5,
                 }}>
                     <Feather name="search" size={20} color="rgba(0, 0, 0, 0.4)" />
                     <TextInput
@@ -98,18 +104,20 @@ export default function ShareScreen() {
                 <FlatList
                     data={filteredData}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <SharingHistoryCard
-                            name={item.name}
-                            details={item.details}
-                            time={item.time}
-                            status={item.status}
-                            onPress={() => handleItemPress(item)}
-                        />
+                    renderItem={({ item, index }) => (
+                        <Animated.View entering={FadeInUp.delay(index * 100).duration(400)}>
+                            <SharingHistoryCard
+                                name={item.name}
+                                details={item.details}
+                                time={item.time}
+                                status={item.status}
+                                onPress={() => handleItemPress(item)}
+                            />
+                        </Animated.View>
                     )}
                     showsVerticalScrollIndicator={false}
                     ItemSeparatorComponent={() => <View style={{ height: ds.space.md }} />}
-                    contentContainerStyle={{ paddingBottom: ds.space.xl }}
+                    contentContainerStyle={{ paddingBottom: 140 + bottom }}
                 />
             </View>
 
@@ -124,27 +132,26 @@ export default function ShareScreen() {
                             <View style={{
                                 paddingHorizontal: ds.space.md,
                                 paddingVertical: 4,
-                                borderRadius: 20,
-                                borderWidth: 1,
-                                borderColor: getStatusStyles(selectedItem.status).border,
+                                borderRadius: ds.radius.full,
+                                backgroundColor: getStatusStyles(selectedItem.status).bg,
                                 marginBottom: ds.space.md
                             }}>
-                                <BodySmallText style={{ color: getStatusStyles(selectedItem.status).text, fontSize: 10 }}>{selectedItem.status}</BodySmallText>
+                                <BodySmallText style={{ color: getStatusStyles(selectedItem.status).text, fontSize: 10, fontFamily: Fonts.medium }}>{selectedItem.status}</BodySmallText>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: ds.space.sm }}>
-                                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' }}>
-                                    <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 16 }}>{selectedItem.name.charAt(0)}</BodyLargeText>
+                                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' }}>
+                                    <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 18 }}>{selectedItem.name.charAt(0)}</BodyLargeText>
                                 </View>
-                                <H2Text>{selectedItem.name}</H2Text>
+                                <H2Text style={{ fontFamily: Fonts.bold }}>{selectedItem.name}</H2Text>
                             </View>
                         </View>
 
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.8)', marginBottom: ds.space.sm }}>Shared Information</BodySmallText>
+                            <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.8)', marginBottom: ds.space.sm, fontFamily: Fonts.semiBold }}>Shared Information</BodySmallText>
 
                             <View style={{
                                 backgroundColor: Colors.white,
-                                borderRadius: ds.radius.md,
+                                borderRadius: ds.radius.xl,
                                 padding: ds.space.lg,
                                 borderColor: '#E5E7EB',
                                 borderWidth: 1
@@ -176,7 +183,7 @@ export default function ShareScreen() {
                             <AppButton
                                 title="Revoke"
                                 onPress={handleRevokePress}
-                                style={{ backgroundColor: '#990000' }}
+                                style={{ backgroundColor: '#990000', borderRadius: ds.radius.lg }}
                             />
                         </View>
                     </>
@@ -189,21 +196,22 @@ export default function ShareScreen() {
                 onClose={() => setRevokeModalVisible(false)}
             >
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: ds.space.xl }}>
-                    <H2Text style={{ textAlign: 'center', marginBottom: ds.space['2xl'] }}>
-                        {selectedItem?.name} will no longer be able to access your shared identity data.
+                    <H2Text style={{ textAlign: 'center', marginBottom: ds.space['2xl'], fontFamily: Fonts.medium }}>
+                        <H2Text style={{ fontFamily: Fonts.bold }}>{selectedItem?.name}</H2Text> will no longer be able to access your shared identity data.
                     </H2Text>
 
                     <View style={{ width: '100%', gap: ds.space.md }}>
                         <AppButton
                             title="Revoke"
                             onPress={() => setRevokeModalVisible(false)}
-                            style={{ backgroundColor: '#990000' }}
+                            style={{ backgroundColor: '#990000', borderRadius: ds.radius.lg }}
                         />
                         <AppButton
                             title="Cancel"
                             onPress={() => setRevokeModalVisible(false)}
                             variant="outline"
-                            textStyle={{ color: Colors.black }}
+                            textStyle={{ color: Colors.black, fontFamily: Fonts.medium }}
+                            style={{ borderRadius: ds.radius.lg, borderColor: '#E5E7EB' }}
                         />
                     </View>
                 </View>

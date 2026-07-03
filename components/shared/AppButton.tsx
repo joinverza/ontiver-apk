@@ -70,6 +70,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    // shadowColor: Colors.black,
+    // shadowOffset: { width: 0, height: 4 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 6,
+    // elevation: 3,
   },
   text: {
     textAlign: 'center',

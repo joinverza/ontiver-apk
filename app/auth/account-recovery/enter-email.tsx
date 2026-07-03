@@ -6,7 +6,7 @@ import Colors from "@/constants/Colors"
 import { useDesignSystem } from "@/utils/design-system"
 import { router } from "expo-router"
 import { useState } from "react"
-import { KeyboardAvoidingView, View } from "react-native"
+import { KeyboardAvoidingView, View, Platform } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const EnterEmail = () => {
@@ -14,7 +14,7 @@ const EnterEmail = () => {
     const ds = useDesignSystem()
     return (
         <SafeAreaView style={{ flex: 1, paddingBottom: ds.space.xl, backgroundColor: Colors.white }}>
-            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <BackButton />
                     <View style={{ marginBottom: ds.space.lg }}>

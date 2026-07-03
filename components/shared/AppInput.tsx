@@ -98,6 +98,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     backgroundColor: Colors.white,
+    // shadowColor: Colors.black,
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 3.84,
+    // elevation: 0,
   },
   input: {
     flex: 1,

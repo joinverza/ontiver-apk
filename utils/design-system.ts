@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
-import { Colors } from '../constants/Colors';
+import { Colors, LightColors, DarkColors } from '../constants/Colors';
 import { Fonts } from '../constants/fonts';
+import { useTheme } from '../context/ThemeContext';
 
 export const SIZE_KEYS = [
   'xs',
@@ -18,6 +19,7 @@ export const SIZE_KEYS = [
   '8xl',
   '9xl',
   '10xl',
+  'full',
 ] as const;
 
 export type SizeKey = (typeof SIZE_KEYS)[number];
@@ -38,6 +40,7 @@ const BASE_SPACE: TokenMap = {
   '8xl': 72,
   '9xl': 80,
   '10xl': 88,
+  'full': 9999,
 };
 
 const BASE_RADIUS: TokenMap = {
@@ -55,6 +58,7 @@ const BASE_RADIUS: TokenMap = {
   '8xl': 64,
   '9xl': 72,
   '10xl': 80,
+  'full': 9999,
 };
 
 function mapTokens(tokens: TokenMap, map: (value: number) => number): TokenMap {
@@ -85,7 +89,7 @@ export type DesignSystem = {
   typography: Record<TypographyVariant, { fontSize: number; lineHeight: number; fontFamily: string }>;
 };
 
-export function createDesignSystem(width: number, height: number): DesignSystem {
+export function createDesignSystem(width: number, height: number, theme: 'light' | 'dark' = 'light'): DesignSystem {
   const scale = (value: number) => Math.round(value * Math.min(Math.max(width / 390, 0.92), 1.15));
 
   const space = mapTokens(BASE_SPACE, scale);
@@ -94,7 +98,7 @@ export function createDesignSystem(width: number, height: number): DesignSystem 
   return {
     width,
     height,
-    colors: Colors,
+    colors: theme === 'dark' ? DarkColors : LightColors,
     space,
     radius,
     typography: {
@@ -149,5 +153,6 @@ export function createDesignSystem(width: number, height: number): DesignSystem 
 
 export function useDesignSystem() {
   const { width, height } = useWindowDimensions();
-  return useMemo(() => createDesignSystem(width, height), [width, height]);
+  const { theme } = useTheme();
+  return useMemo(() => createDesignSystem(width, height, theme), [width, height, theme]);
 }
