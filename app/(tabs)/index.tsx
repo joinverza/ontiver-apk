@@ -166,45 +166,73 @@ export default function HomeScreen() {
 
               <View style={{ flexDirection: "row", alignItems: "center", marginTop: ds.space.sm }}>
                 <BodyLargeText style={{ fontFamily: Fonts.bold, flex: 1, fontSize: 18, color: ds.colors.mainText }}>My Credentials</BodyLargeText>
-                <BodySmallText color={ds.colors.primary} style={{ fontFamily: Fonts.medium }}>See all</BodySmallText>
+                <TouchableOpacity onPress={() => router.push('/vault')}>
+
+                  <BodySmallText color={ds.colors.primary} style={{ fontFamily: Fonts.medium }}>See all</BodySmallText>
+                </TouchableOpacity>
               </View>
 
-              <FlatList
-                data={myCredentials}
-                renderItem={({ item, index }) => {
+              <View style={{ marginTop: ds.space.md }}>
+                {myCredentials.map((item, index) => {
                   const renderColors = () => {
                     if (item.status === "Verified") return { bg: isDark ? "rgba(34, 197, 94, 0.2)" : "rgba(208, 255, 221, 1)", text: isDark ? "#4ade80" : "rgba(0, 125, 33, 1)", icon: ASSETS.ICONS.HOME_CHECKMARK }
                     if (item.status === "Pending") return { bg: isDark ? "rgba(251, 146, 60, 0.2)" : "rgba(255, 230, 208, 1)", text: isDark ? "#fb923c" : "rgba(170, 81, 2, 1)", icon: ASSETS.ICONS.HOME_ALERT }
                     if (item.status === "Declined") return { bg: isDark ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 208, 209, 1)", text: isDark ? "#ef4444" : "rgba(125, 0, 2, 1)", icon: ASSETS.ICONS.HOME_CANCEL }
                   }
 
-                  const colors = renderColors()
-                  const Icon = colors?.icon
+                  // Vibrant colors based on index to match the requested design
+                  const vibrantBgColors = ['#441af1', '#ccfc12', '#7f8a12'];
+                  const cardBgColor = vibrantBgColors[index % vibrantBgColors.length];
+                  const isLightBg = cardBgColor === '#ccfc12';
+                  const textColor = isLightBg ? ds.colors.black : ds.colors.white;
+                  const secondaryTextColor = isLightBg ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)';
+
+                  const statusColors = renderColors()
+                  const Icon = statusColors?.icon
 
                   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
                   return (
                     <AnimatedTouchableOpacity
-                      entering={FadeInRight.delay(index * 150).duration(400)}
-                      style={{ gap: ds.space.sm, padding: ds.space.lg, backgroundColor: ds.colors.white, borderRadius: ds.radius.xl, borderColor: ds.colors.inputBorder, borderWidth: 1, width: ds.width * 0.45, shadowColor: ds.colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: isDark ? 0.2 : 0.03, shadowRadius: 8, elevation: 2 }}>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                        <BodySmallText style={{ color: ds.colors.secondaryText, fontFamily: Fonts.medium }}>{item.country}</BodySmallText>
+                      key={item.id}
+                      entering={FadeInUp.delay(index * 150).duration(400)}
+                      style={{
+                        backgroundColor: cardBgColor,
+                        borderRadius: ds.radius.xl * 1.5,
+                        padding: ds.space.xl,
+                        width: '100%',
+                        marginTop: index > 0 ? -40 : 0, // Overlapping effect
+                        shadowColor: ds.colors.black,
+                        shadowOffset: { width: 0, height: -2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                        elevation: 4,
+                        zIndex: myCredentials.length + index, // Ensure bottom cards are above top ones
+                      }}>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <View style={{ flex: 1 }}>
+                          <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 24, color: textColor, marginBottom: ds.space.xs }}>{item.title}</BodyLargeText>
+                          <BodySmallText style={{ color: secondaryTextColor, fontFamily: Fonts.medium }}>{item.country} • {item.date}</BodySmallText>
+                        </View>
+
+                        <View style={{
+                          backgroundColor: isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.5)',
+                          width: 44,
+                          height: 44,
+                          borderRadius: 22,
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}>
+                          {Icon && <Icon width={20} height={20} />}
+                        </View>
                       </View>
-                      <View style={{ flex: 1, marginVertical: ds.space.xs }}>
-                        <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 15, color: ds.colors.mainText }}>{item.title}</BodyLargeText>
-                        <BodySmallText style={{ color: ds.colors.secondaryText, marginTop: 4, fontSize: 11 }}>{item.date}</BodySmallText>
-                      </View>
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: colors?.bg, paddingHorizontal: 8, paddingVertical: 4, borderRadius: ds.radius.full }}>
-                        {Icon && <Icon width={10} height={10} />}
-                        <BodySmallText style={{ color: colors?.text, fontFamily: Fonts.medium }} size={10}>{item.status}</BodySmallText>
+
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: ds.radius.full, marginTop: ds.space.lg }}>
+                        <BodySmallText style={{ color: textColor, fontFamily: Fonts.semiBold }} size={12}>{item.status}</BodySmallText>
                       </View>
                     </AnimatedTouchableOpacity>
                   )
-                }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ItemSeparatorComponent={() => <View style={{ width: ds.space.lg }} />}
-                contentContainerStyle={{ paddingVertical: ds.space.md }}
-              />
+                })}
+              </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginTop: ds.space.md }}>
                 <BodyLargeText style={{ fontFamily: Fonts.bold, flex: 1, fontSize: 18, color: ds.colors.mainText }}>Recent Activities</BodyLargeText>
