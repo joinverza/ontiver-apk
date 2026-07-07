@@ -78,7 +78,8 @@ export default function OnboardingScreen() {
   };
 
   // Button Animation Styles (Sweeps from Top-Left to Bottom-Right)
-  const btnTopBase = 290 + (insets.top > 0 ? insets.top : 20); 
+  // Set Y-offset to 360 to perfectly accommodate the massive 68px text block on Slide 1
+  const btnTopBase = 360 + (insets.top > 0 ? insets.top : 20); 
   const btnStyle = useAnimatedStyle(() => {
     const tx = interpolate(
       scrollX.value,
@@ -95,7 +96,7 @@ export default function OnboardingScreen() {
     return {
       transform: [
         { translateX: tx },
-        { translateY: ty }
+        { translateY: ty } 
       ]
     };
   });
@@ -128,7 +129,7 @@ export default function OnboardingScreen() {
               {slide.layout === 'text-top' ? (
                 <>
                   <View style={[styles.textContainerTop, { marginTop: 60 + insets.top }]}>
-                    <Text style={styles.title}>{slide.title}</Text>
+                    <Text style={[styles.title, slide.id === 1 && styles.titleLarge]}>{slide.title}</Text>
                     <Text style={styles.subtitle}>{slide.subtitle}</Text>
                   </View>
                   <View style={styles.visualContainerBottom}>
@@ -141,7 +142,7 @@ export default function OnboardingScreen() {
                     <slide.Visual />
                   </View>
                   <View style={[styles.textContainerBottom, { paddingBottom: 120 + insets.bottom }]}>
-                    <Text style={styles.title}>{slide.title}</Text>
+                    <Text style={[styles.title, slide.id === 1 && styles.titleLarge]}>{slide.title}</Text>
                     <Text style={styles.subtitle}>{slide.subtitle}</Text>
                   </View>
                 </>
@@ -212,6 +213,7 @@ const styles = StyleSheet.create({
   // -- Slide 1: Text Top --
   textContainerTop: {
     paddingHorizontal: 32,
+    top: 60,
   },
   visualContainerBottom: {
     flex: 1,
@@ -230,19 +232,23 @@ const styles = StyleSheet.create({
   
   // -- Typography --
   title: {
+    fontFamily: 'Inter_700Bold',
     fontSize: 44,
-    fontWeight: '800',
     color: '#020805', // Almost black
     lineHeight: 52,
     marginBottom: 16,
     letterSpacing: -1,
   },
+  titleLarge: {
+    fontSize: 68,
+    lineHeight: 72,
+  },
   subtitle: {
+    fontFamily: 'Inter_500Medium',
     fontSize: 17,
     color: '#4B5563', // Gray-600
     lineHeight: 26,
     maxWidth: '95%',
-    fontWeight: '500',
   },
 
   // -- Navigation Elements --
@@ -255,9 +261,9 @@ const styles = StyleSheet.create({
     marginLeft: -10, // negative margin for easier tap target without shifting text
   },
   skipText: {
+    fontFamily: 'Inter_700Bold',
     color: '#020805',
     fontSize: 16,
-    fontWeight: '700',
   },
   nextButtonWrapper: {
     position: 'absolute',
