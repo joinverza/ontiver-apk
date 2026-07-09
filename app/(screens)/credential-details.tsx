@@ -6,10 +6,9 @@ import { Fonts } from '@/constants/fonts';
 import { useDesignSystem } from '@/utils/design-system';
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, View, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { ImageBackground, ScrollView, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ASSETS } from '@/utils/assets';
-
 export default function CredentialDetailsScreen() {
     const ds = useDesignSystem();
 
@@ -47,8 +46,7 @@ export default function CredentialDetailsScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: ds.space['4xl'] }}>
                 {/* Banner */}
-                <ImageBackground
-                    source={ASSETS.IMAGES.HOME_SLIDER_1}
+                <View
                     style={{
                         marginTop: ds.space.xl,
                         borderRadius: ds.radius.lg,
@@ -57,9 +55,13 @@ export default function CredentialDetailsScreen() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         minHeight: 140,
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        position: 'relative'
                     }}
                 >
+                    <View style={StyleSheet.absoluteFill}>
+                        <ASSETS.IMAGES.HOME_SLIDER_1 width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                    </View>
                     <View style={{ flex: 1, zIndex: 10 }}>
                         <View style={{ 
                             borderWidth: 1, 
@@ -89,7 +91,7 @@ export default function CredentialDetailsScreen() {
                     }}>
                         <Feather name="check" size={40} color={Colors.white} />
                     </View>
-                </ImageBackground>
+                </View>
 
                 {/* Credential Details */}
                 <Label style={{ marginTop: ds.space.xl, marginBottom: ds.space.md }}>Credential Details</Label>

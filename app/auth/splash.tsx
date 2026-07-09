@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import {
   Dimensions,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import Animated, {
   Easing,
   interpolate,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -17,29 +17,32 @@ import Animated, {
   withDelay,
   runOnJS,
 } from 'react-native-reanimated';
+import Svg, { Circle as SvgCircle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const SCREEN           = Dimensions.get('window');
-const GREEN            = '#1ED760';
-const BRIGHT_GREEN     = '#A8E63D';
-const DARK_BG          = '#041A0B'; // rich deep forest green
-const INNER_BG         = '#072010'; // slightly lighter dark green disc
-const LOADER_DURATION  = 3400;      // ms total on-screen time (increased to allow staggered entrance)
-const PROGRESS_MS      = 1850;      // ms the bar takes to fill
-const PROGRESS_W       = 240;       // px – track width (slightly wider for style)
+const SCREEN = Dimensions.get('window');
+const GREEN = '#1ED760';
+const BRIGHT_GREEN = '#6ae63d';
+const DARK_BG = '#041A0B';
+const INNER_BG = '#072010';
+const LOADER_DURATION = 3400;
+const PROGRESS_MS = 2200;
+
+// Animated SVG Circle
+const AnimatedSvgCircle = Animated.createAnimatedComponent(SvgCircle);
 
 export default function SplashScreen() {
   const router = useRouter();
 
   // ── Staggered Entrance ───────────────────────────────────────
   const orbitOpacity = useSharedValue(0);
-  const orbitY       = useSharedValue(24);
-  
-  const textOpacity  = useSharedValue(0);
-  const textY        = useSharedValue(20);
-  
-  const barOpacity   = useSharedValue(0);
-  const barY         = useSharedValue(16);
+  const orbitY = useSharedValue(24);
+
+  const textOpacity = useSharedValue(0);
+  const textY = useSharedValue(20);
+
+  const barOpacity = useSharedValue(0);
+  const barY = useSharedValue(16);
 
   // ── Ring rotations (spin continuously) ───────────────────────
   const outerRot = useSharedValue(0);
@@ -50,7 +53,7 @@ export default function SplashScreen() {
 
   // ── Continuous Breathing ──────────────────────────────────────
   const logoScale = useSharedValue(1);
-  const textGlow  = useSharedValue(1);
+  const textGlow = useSharedValue(1);
 
   // ── Exit fade ─────────────────────────────────────────────────
   const screenOpacity = useSharedValue(1);
@@ -58,15 +61,15 @@ export default function SplashScreen() {
   useEffect(() => {
     // 1. Orbit scales/fades in first
     orbitOpacity.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.exp) });
-    orbitY.value       = withTiming(0, { duration: 700, easing: Easing.out(Easing.exp) });
+    orbitY.value = withTiming(0, { duration: 700, easing: Easing.out(Easing.exp) });
 
     // 2. Text fades in after 250ms
     textOpacity.value = withDelay(250, withTiming(1, { duration: 600, easing: Easing.out(Easing.exp) }));
-    textY.value       = withDelay(250, withTiming(0, { duration: 600, easing: Easing.out(Easing.exp) }));
+    textY.value = withDelay(250, withTiming(0, { duration: 600, easing: Easing.out(Easing.exp) }));
 
     // 3. Bar fades in after 500ms
     barOpacity.value = withDelay(500, withTiming(1, { duration: 600, easing: Easing.out(Easing.exp) }));
-    barY.value       = withDelay(500, withTiming(0, { duration: 600, easing: Easing.out(Easing.exp) }));
+    barY.value = withDelay(500, withTiming(0, { duration: 600, easing: Easing.out(Easing.exp) }));
 
     // Rings spin continuously
     outerRot.value = withRepeat(
@@ -104,7 +107,7 @@ export default function SplashScreen() {
     }, LOADER_DURATION);
 
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function navigate() {
@@ -158,21 +161,6 @@ export default function SplashScreen() {
     ],
   }));
 
-  // Progress bar wrapper width
-  const progressBarStyle = useAnimatedStyle(() => ({
-    width: progress.value * PROGRESS_W,
-  }));
-
-  // Progress tip positioning
-  const progressTipTranslateStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: progress.value * PROGRESS_W }],
-  }));
-
-  // Progress tip glow opacity (fades out at the very end so it doesn't linger)
-  const tipOpacityStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 0.1, 0.95, 1], [0, 1, 1, 0]),
-  }));
-
   const logoAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: logoScale.value }],
   }));
@@ -181,21 +169,29 @@ export default function SplashScreen() {
     opacity: textGlow.value,
   }));
 
-  // ── Layout constants ─────────────────────────────────────────
-  const BASE_SIZE = Math.min(SCREEN.width * 0.54, 212);
-  
-  const logoSize      = BASE_SIZE * 0.84;
+  // ── Circular progress arc ───────────────────────────────────────
+  // We use the outer ring's size to set the radius
+  const BASE_SIZE = Math.min(SCREEN.width * 0.38, 150);
+  const outerRingSize = BASE_SIZE * 1.55;
+  const RING_RADIUS = (outerRingSize / 2) - 3; // slightly inset so stroke doesn't overflow
+  const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+  const arcProps = useAnimatedProps(() => ({
+    strokeDashoffset: CIRCUMFERENCE * (1 - progress.value),
+  }));
+
+
+  const logoSize = BASE_SIZE * 0.84;
   const innerDiscSize = BASE_SIZE * 1.15;
   const innerRingSize = BASE_SIZE * 1.35;
-  const outerRingSize = BASE_SIZE * 1.55;
 
   return (
     <Animated.View style={[styles.screen, screenStyle]}>
 
       {/* Radial glow */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {/* <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <Animated.View style={[styles.radialGlow, glowStyle]} />
-      </View>
+      </View> */}
 
       <View style={styles.topLine} pointerEvents="none" />
 
@@ -209,29 +205,16 @@ export default function SplashScreen() {
           <Animated.View
             style={[
               styles.outerRing,
-              { 
-                width: outerRingSize, 
-                height: outerRingSize, 
+              {
+                width: outerRingSize,
+                height: outerRingSize,
                 borderRadius: outerRingSize / 2,
                 top: 0,
                 left: 0,
               },
               outerRingStyle,
             ]}
-          >
-            {/* Stylish Pointer: glowing neon capsule */}
-            <View style={[
-              styles.pointer, 
-              { 
-                top: -2.5, 
-                left: (outerRingSize - 18) / 2, 
-                width: 18, height: 5, borderRadius: 2.5,
-                backgroundColor: BRIGHT_GREEN,
-                shadowColor: BRIGHT_GREEN,
-                shadowRadius: 8,
-              }
-            ]} />
-          </Animated.View>
+          />
 
           {/* Inner ring */}
           <Animated.View
@@ -246,21 +229,7 @@ export default function SplashScreen() {
               },
               innerRingStyle,
             ]}
-          >
-            {/* Stylish Pointer: rotating diamond */}
-            <View style={[
-              styles.pointer, 
-              { 
-                top: -4, 
-                left: (innerRingSize - 8) / 2, 
-                width: 8, height: 8,
-                backgroundColor: '#FFFFFF',
-                shadowColor: '#FFFFFF',
-                shadowRadius: 6,
-                transform: [{ rotate: '45deg' }]
-              }
-            ]} />
-          </Animated.View>
+          />
 
           {/* Dark disc behind logo */}
           <View
@@ -277,10 +246,10 @@ export default function SplashScreen() {
           />
 
           {/* Logo centred */}
-          <Animated.View style={[styles.logoWrapper, { 
-            width: logoSize, 
-            height: logoSize, 
-            top: (outerRingSize - logoSize) / 2, 
+          <Animated.View style={[styles.logoWrapper, {
+            width: logoSize,
+            height: logoSize,
+            top: (outerRingSize - logoSize) / 2,
             left: (outerRingSize - logoSize) / 2,
           }, logoAnimatedStyle]}>
             <ASSETS.AUTH.SPLASH_LOGO width="100%" height="100%" />
@@ -288,16 +257,15 @@ export default function SplashScreen() {
         </Animated.View>
 
         {/* 2. Text Block */}
-        <Animated.View style={[styles.textBlock, textEntranceStyle]}>
+        {/* <Animated.View style={[styles.textBlock, textEntranceStyle]}>
           <Animated.View style={[styles.textBlockInner, textAnimatedStyle]}>
             <Text style={styles.brandLabel}>Ontiver</Text>
             <Text style={styles.subLabel}>Opening secure identity workspace</Text>
           </Animated.View>
-        </Animated.View>
+        </Animated.View> */}
 
         {/* 3. Progress Bar */}
-        <Animated.View style={[styles.progressTrack, barEntranceStyle]}>
-          {/* Masked track for the gradient fill */}
+        {/* <Animated.View style={[styles.progressTrack, barEntranceStyle]}>
           <View style={styles.progressMask}>
             <Animated.View style={[styles.progressFillWrapper, progressBarStyle]}>
               <LinearGradient
@@ -309,8 +277,48 @@ export default function SplashScreen() {
             </Animated.View>
           </View>
 
-          {/* Unmasked glowing tip that follows the edge */}
           <Animated.View style={[styles.progressTip, progressTipTranslateStyle, tipOpacityStyle]} />
+        </Animated.View> */}
+
+        {/* Circular progress arc — drawn on top of the outer orbit ring */}
+        <Animated.View
+          style={[{
+            position: 'absolute',
+            width: outerRingSize,
+            height: outerRingSize,
+            top: 0,
+            left: 0,
+          }, orbitEntranceStyle]}
+          pointerEvents="none"
+        >
+          <Svg
+            width={outerRingSize}
+            height={outerRingSize}
+            style={{ transform: [{ rotate: '-90deg' }] }}
+          >
+            {/* Track (background arc) */}
+            <SvgCircle
+              cx={outerRingSize / 2}
+              cy={outerRingSize / 2}
+              r={RING_RADIUS}
+              stroke="rgba(30,215,96,0.12)"
+              strokeWidth={3}
+              fill="none"
+              strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+            />
+            {/* Fill arc */}
+            <AnimatedSvgCircle
+              cx={outerRingSize / 2}
+              cy={outerRingSize / 2}
+              r={RING_RADIUS}
+              stroke={BRIGHT_GREEN}
+              strokeWidth={3}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+              animatedProps={arcProps}
+            />
+          </Svg>
         </Animated.View>
 
       </View>
@@ -365,13 +373,14 @@ const styles = StyleSheet.create({
   },
   innerRing: {
     position: 'absolute',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: 'rgba(30,215,96,0.50)',
+    borderStyle: 'dashed',
   },
   innerDisc: {
     position: 'absolute',
     backgroundColor: INNER_BG,
-    shadowColor: '#1ED760',
+    shadowColor: '#0e3c1e90',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 32,
@@ -410,37 +419,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 13,
     color: 'rgba(187,224,196,0.75)',
-  },
-
-  // ── Progress bar ─────────────────────────────────────────────
-  progressTrack: {
-    marginTop: 32,
-    height: 4,
-    width: PROGRESS_W,
-    // We remove overflow: hidden from the track so the tip glow isn't clipped
-  },
-  progressMask: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 9999,
-    backgroundColor: 'rgba(30,215,96,0.12)',
-    overflow: 'hidden', // Mask only the linear gradient
-  },
-  progressFillWrapper: {
-    height: '100%',
-    borderRadius: 9999,
-  },
-  progressTip: {
-    position: 'absolute',
-    left: -3,
-    top: -2,
-    bottom: -2,
-    width: 6,
-    borderRadius: 3,
-    backgroundColor: '#FFFFFF',
-    shadowColor: BRIGHT_GREEN,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 4,
   },
 });

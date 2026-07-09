@@ -1,5 +1,6 @@
 import { Fonts } from '@/constants/fonts';
 import { ASSETS } from '@/utils/assets';
+import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -7,6 +8,7 @@ import Animated, { FadeInRight, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BodyLargeText, BodySmallText, Label } from '../../components/shared/AppTexts';
 import { HomeBannerSlider } from '../../components/shared/HomeBannerSlider';
+import { CredentialCard } from '../../components/shared/CredentialCard';
 import { useTheme } from '../../context/ThemeContext';
 import { useDesignSystem } from '../../utils/design-system';
 
@@ -40,17 +42,33 @@ export default function HomeScreen() {
   const myCredentials = [
     {
       id: 1,
-      country: "Nigeria",
-      title: "National ID Card",
-      status: "Verified",
-      date: "15th April, 2026"
+      label: 'NIN',
+      title: 'National Identification',
+      country: 'Nigeria',
+      status: 'Verified',
+      date: '15th April, 2026',
+      bgColor: '#000000',
+      credentialType: 'kyc' as const,
     },
     {
       id: 2,
-      country: "Nigeria",
-      title: "National ID Card",
-      status: "Pending",
-      date: "15th April, 2026"
+      label: 'BVN',
+      title: 'Bank Verification',
+      country: 'Nigeria',
+      status: 'Verified',
+      date: '15th April, 2026',
+      bgColor: '#00ff40',
+      credentialType: 'aml' as const,
+    },
+    {
+      id: 3,
+      label: 'Passport',
+      title: 'International Passport',
+      country: 'Nigeria',
+      status: 'Pending',
+      date: '15th April, 2026',
+      bgColor: '#3801E5',
+      credentialType: 'kyb' as const,
     },
   ]
 
@@ -92,10 +110,10 @@ export default function HomeScreen() {
       />
 
       <View style={{ paddingHorizontal: ds.space.lg, paddingTop: top }}>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: ds.space.lg }}>
+        <View style={{ flexDirection: "row", alignItems: "center", marginTop: ds.space.md, marginBottom: ds.space.sm }}>
           <View style={{ flex: 1 }}>
-            <BodySmallText style={{ color: ds.colors.secondaryText }}>Welcome Back</BodySmallText>
-            <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 24, marginTop: 4, color: ds.colors.mainText }}>Gracious</BodyLargeText>
+            <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 18 }}>Welcome Back</BodySmallText>
+            <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 34, marginTop: 4, color: ds.colors.mainText }}>Gracious</BodyLargeText>
           </View>
           <TouchableOpacity style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : ds.colors.white, padding: ds.space.sm, borderRadius: ds.radius.full, shadowColor: ds.colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 3, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'transparent' }} onPress={() => router.push('/(screens)/notifications')}>
             <ASSETS.ICONS.NOTIFICATION_ICON width={24} height={24} />
@@ -106,28 +124,27 @@ export default function HomeScreen() {
           data={recentActivities}
           renderItem={({ item, index }) => {
             const renderColors = () => {
-              if (item.status === "Verified") return { bg: isDark ? "rgba(34, 197, 94, 0.2)" : "rgba(208, 255, 221, 1)", text: isDark ? "#4ade80" : "rgba(0, 125, 33, 1)", icon: ASSETS.ICONS.HOME_CHECKMARK }
-              if (item.status === "Pending") return { bg: isDark ? "rgba(251, 146, 60, 0.2)" : "rgba(255, 230, 208, 1)", text: isDark ? "#fb923c" : "rgba(170, 81, 2, 1)", icon: ASSETS.ICONS.HOME_ALERT }
-              if (item.status === "Declined") return { bg: isDark ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 208, 209, 1)", text: isDark ? "#ef4444" : "rgba(125, 0, 2, 1)", icon: ASSETS.ICONS.HOME_CANCEL }
+              if (item.status === "Verified") return { bg: isDark ? "rgba(34, 197, 94, 0.14)" : "rgba(232, 255, 238, 1)", text: isDark ? "#86efac" : "rgba(0, 125, 33, 1)", border: isDark ? "rgba(74, 222, 128, 0.25)" : "rgba(0, 125, 33, 0.14)", dot: "#22c55e" }
+              if (item.status === "Pending") return { bg: isDark ? "rgba(251, 146, 60, 0.14)" : "rgba(255, 246, 235, 1)", text: isDark ? "#fdba74" : "rgba(170, 81, 2, 1)", border: isDark ? "rgba(251, 146, 60, 0.25)" : "rgba(170, 81, 2, 0.14)", dot: "#fb923c" }
+              if (item.status === "Declined") return { bg: isDark ? "rgba(239, 68, 68, 0.14)" : "rgba(255, 241, 242, 1)", text: isDark ? "#fca5a5" : "rgba(125, 0, 2, 1)", border: isDark ? "rgba(239, 68, 68, 0.25)" : "rgba(125, 0, 2, 0.14)", dot: "#ef4444" }
             }
 
             const colors = renderColors()
-            const Icon = colors?.icon
 
             const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
             return (
               <AnimatedTouchableOpacity
                 entering={FadeInUp.delay(index * 100).duration(400)}
-                style={{ flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.xl, borderColor: ds.colors.inputBorder, borderWidth: 1, shadowColor: ds.colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: isDark ? 0.2 : 0.03, shadowRadius: 8, elevation: 2 }}>
-                <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : "rgba(248, 250, 252, 1)", padding: ds.space.sm, borderRadius: ds.radius.lg }}>
+                style={{ flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.xl, borderColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(226, 232, 240, 1)", borderWidth: 1 }}>
+                <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : "rgba(248, 250, 252, 1)", padding: ds.space.sm, borderRadius: ds.radius.lg, borderWidth: 1, borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(226, 232, 240, 1)" }}>
                   <ASSETS.ICONS.HOME_RECENT_ACTIVITY />
                 </View>
                 <View style={{ flex: 1 }}>
                   <BodyLargeText style={{ fontFamily: Fonts.medium, color: ds.colors.mainText }}>{item.title}</BodyLargeText>
                   <BodySmallText style={{ color: ds.colors.secondaryText, marginTop: 2 }}>{item.date}</BodySmallText>
                 </View>
-                <View style={{ flexDirection: "row", backgroundColor: colors?.bg, paddingHorizontal: ds.space.sm, paddingVertical: 6, justifyContent: "center", alignItems: "center", borderRadius: ds.radius.full, gap: 4 }}>
-                  {Icon && <Icon width={12} height={12} />}
+                <View style={{ flexDirection: "row", backgroundColor: colors?.bg, borderColor: colors?.border, borderWidth: 1, paddingHorizontal: ds.space.sm, paddingVertical: 6, justifyContent: "center", alignItems: "center", borderRadius: ds.radius.full, gap: 6 }}>
+                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors?.dot }} />
                   <BodySmallText style={{ color: colors?.text, fontFamily: Fonts.medium }} size={12}>{item.status}</BodySmallText>
                 </View>
               </AnimatedTouchableOpacity>
@@ -144,18 +161,33 @@ export default function HomeScreen() {
                 data={info}
                 renderItem={({ item, index }) => {
                   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+                  const accent = index === 0
+                    ? {
+                      icon: "shield" as const,
+                      iconColor: isDark ? "#86efac" : "rgba(0, 125, 33, 1)",
+                      surface: isDark ? "rgba(34, 197, 94, 0.12)" : "rgba(232, 255, 238, 1)",
+                      border: isDark ? "rgba(74, 222, 128, 0.24)" : "rgba(0, 125, 33, 0.16)",
+                    }
+                    : {
+                      icon: "bell" as const,
+                      iconColor: isDark ? "#7dd3fc" : "rgba(2, 132, 199, 1)",
+                      surface: isDark ? "rgba(56, 189, 248, 0.12)" : "rgba(239, 250, 255, 1)",
+                      border: isDark ? "rgba(125, 211, 252, 0.24)" : "rgba(2, 132, 199, 0.16)",
+                    }
+
                   return (
                     <AnimatedTouchableOpacity
                       entering={FadeInRight.delay(index * 150).duration(400)}
                       onPress={item.onPress}
-                      style={{ borderWidth: 1, flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.xl, width: ds.width * 0.75, borderColor: isDark ? "rgba(255, 211, 142, 0.4)" : "rgba(255, 211, 142, 1)", shadowColor: "rgba(255, 211, 142, 0.4)", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 4 }}>
-                      <View style={{ backgroundColor: isDark ? "rgba(255, 211, 142, 0.15)" : "rgba(255, 240, 219, 1)", padding: ds.space.sm, borderRadius: ds.radius.full }}>
-                        <ASSETS.ICONS.NOTIFICATION_ICON width={18} height={18} />
+                      style={{ borderWidth: 1, flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.lg, width: Math.min(ds.width * 0.78, 320), borderColor: accent.border }}>
+                      <View style={{ backgroundColor: accent.surface, width: 44, height: 44, borderRadius: ds.radius.md, justifyContent: "center", alignItems: "center", borderWidth: 1, borderColor: accent.border }}>
+                        <Feather name={accent.icon} size={20} color={accent.iconColor} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Label style={{ fontFamily: Fonts.semiBold, fontSize: 13, color: ds.colors.mainText }}>{item.title}</Label>
                         <BodySmallText style={{ color: ds.colors.secondaryText, marginTop: 2 }} size={11}>{item.description}</BodySmallText>
                       </View>
+                      <Feather name="chevron-right" size={18} color={ds.colors.secondaryText} />
                     </AnimatedTouchableOpacity>
                   )
                 }}
@@ -172,65 +204,50 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </View>
 
-              <View style={{ marginTop: ds.space.md }}>
+              {/* Stacked Credentials */}
+              <View style={{ marginTop: ds.space.md, height: 158 + 170, width: '100%', alignItems: 'center', position: 'relative' }}>
                 {myCredentials.map((item, index) => {
-                  const renderColors = () => {
-                    if (item.status === "Verified") return { bg: isDark ? "rgba(34, 197, 94, 0.2)" : "rgba(208, 255, 221, 1)", text: isDark ? "#4ade80" : "rgba(0, 125, 33, 1)", icon: ASSETS.ICONS.HOME_CHECKMARK }
-                    if (item.status === "Pending") return { bg: isDark ? "rgba(251, 146, 60, 0.2)" : "rgba(255, 230, 208, 1)", text: isDark ? "#fb923c" : "rgba(170, 81, 2, 1)", icon: ASSETS.ICONS.HOME_ALERT }
-                    if (item.status === "Declined") return { bg: isDark ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 208, 209, 1)", text: isDark ? "#ef4444" : "rgba(125, 0, 2, 1)", icon: ASSETS.ICONS.HOME_CANCEL }
-                  }
+                  const AnimatedView = Animated.createAnimatedComponent(View);
+                  const isFront = index === 0;
+                  const isMiddle = index === 1;
 
-                  // Vibrant colors based on index to match the requested design
-                  const vibrantBgColors = ['#441af1', '#ccfc12', '#7f8a12'];
-                  const cardBgColor = vibrantBgColors[index % vibrantBgColors.length];
-                  const isLightBg = cardBgColor === '#ccfc12';
-                  const textColor = isLightBg ? ds.colors.black : ds.colors.white;
-                  const secondaryTextColor = isLightBg ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)';
+                  const topOffset = isFront ? 170 : isMiddle ? 85 : 0;
+                  const zIndex = 3 - index;
 
-                  const statusColors = renderColors()
-                  const Icon = statusColors?.icon
-
-                  const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
                   return (
-                    <AnimatedTouchableOpacity
+                    <AnimatedView
                       key={item.id}
                       entering={FadeInUp.delay(index * 150).duration(400)}
                       style={{
-                        backgroundColor: cardBgColor,
-                        borderRadius: ds.radius.xl * 1.5,
-                        padding: ds.space.xl,
+                        position: 'absolute',
+                        top: topOffset,
+                        zIndex,
                         width: '100%',
-                        marginTop: index > 0 ? -40 : 0, // Overlapping effect
-                        shadowColor: ds.colors.black,
-                        shadowOffset: { width: 0, height: -2 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 8,
-                        elevation: 4,
-                        zIndex: myCredentials.length + index, // Ensure bottom cards are above top ones
-                      }}>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <View style={{ flex: 1 }}>
-                          <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 24, color: textColor, marginBottom: ds.space.xs }}>{item.title}</BodyLargeText>
-                          <BodySmallText style={{ color: secondaryTextColor, fontFamily: Fonts.medium }}>{item.country} • {item.date}</BodySmallText>
-                        </View>
-
-                        <View style={{
-                          backgroundColor: isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.5)',
-                          width: 44,
-                          height: 44,
-                          borderRadius: 22,
-                          justifyContent: 'center',
-                          alignItems: 'center'
-                        }}>
-                          {Icon && <Icon width={20} height={20} />}
-                        </View>
-                      </View>
-
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: ds.radius.full, marginTop: ds.space.lg }}>
-                        <BodySmallText style={{ color: textColor, fontFamily: Fonts.semiBold }} size={12}>{item.status}</BodySmallText>
-                      </View>
-                    </AnimatedTouchableOpacity>
-                  )
+                      }}
+                    >
+                      <TouchableOpacity
+                        activeOpacity={0.88}
+                        onPress={() => router.push({
+                          pathname: '/vault',
+                          params: {
+                            credentialId: String(item.id),
+                            openCredentialAt: String(Date.now()),
+                          },
+                        })}
+                        style={{ width: '100%', alignItems: 'center' }}
+                      >
+                        <CredentialCard
+                          label={item.label}
+                          title={item.title}
+                          bgColor={item.bgColor}
+                          credentialType={item.credentialType}
+                          status={item.status}
+                          width={ds.width - ds.space.lg * 2}
+                          height={158}
+                        />
+                      </TouchableOpacity>
+                    </AnimatedView>
+                  );
                 })}
               </View>
 
@@ -252,7 +269,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={{ backgroundColor: ds.colors.primary, width: 64, height: 64, borderRadius: 32, justifyContent: "center", alignItems: "center", shadowColor: ds.colors.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
             onPress={() => router.push('/(screens)/scan')}>
-            <ASSETS.ICONS.FLOATING_ACTION_ICON />
+            <Feather name="plus" size={32} color={ds.colors.white} />
           </TouchableOpacity>
         </Animated.View>
       </View>

@@ -35,15 +35,14 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
       <FlatList
         ref={flatListRef}
         data={data}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={item.onPress} style={{ width: ds.width * 0.9 }}>
-            <Image
-              source={item.image}
-              resizeMode="cover"
-              style={{ width: '100%', height: ds.width * 0.4, borderRadius: ds.space.md }}
-            />
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const SvgImage = item.image;
+          return (
+            <TouchableOpacity onPress={item.onPress} style={{ width: ds.width * 0.9, borderRadius: ds.space.md, overflow: 'hidden' }}>
+              <SvgImage width="100%" height={ds.width * 0.4} />
+            </TouchableOpacity>
+          );
+        }}
         horizontal
         showsHorizontalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ width: ds.space.lg }} />}
