@@ -135,7 +135,7 @@ export function Slide3Visual() {
   return (
     <View style={styles.container}>
       <Pressable onPress={handlePress} style={styles.pressable}>
-        <Animated.View style={[styles.dialShadow, wrapperStyle]}>
+        <Animated.View style={[wrapperStyle]}>
           <Svg width={DIAL_SIZE} height={DIAL_SIZE} viewBox="0 0 300 300">
             <Defs>
               <RadialGradient id="outerMetal" cx="38%" cy="27%" r="74%">

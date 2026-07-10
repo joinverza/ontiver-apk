@@ -173,10 +173,10 @@ export function CredentialCard({
     : bgColor ? isLightColor(bgColor) : false;
   const textColor = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
   const subColor  = isLight ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.65)';
-  const iconColor = isLight ? 'rgba(0,0,0,0.7)' : '#ffffff';
+  const iconColor = isLight ? 'rgb(255, 255, 255)' : '#ffffff';
   const badgeBg   = isBlur
     ? undefined
-    : isLight ? 'rgba(113, 116, 113, 0.21)' : 'rgba(153, 153, 153, 0.2)';
+    : isLight ? 'rgb(0, 0, 0)' : 'rgba(153, 153, 153, 0.2)';
 
   return (
     <View style={[{ width, height }, style, cardStyles.shadow]}>

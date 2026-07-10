@@ -165,8 +165,8 @@ export function Slide2Visual() {
               </Svg>
             </View>
             <View style={styles.content}>
-              <Text style={[styles.value, { color: 'rgba(255, 255, 255, 1)' }]}>KYB</Text>
-              <Text style={[styles.label, { color: 'rgba(255, 255, 255, 0.8)' }]}>Business Verification</Text>
+              <Text style={[styles.value, { color: 'rgba(255, 255, 255, 1)' }]}>Passport</Text>
+              <Text style={[styles.label, { color: 'rgba(255, 255, 255, 0.8)' }]}>International Passport</Text>
             </View>
           </Animated.View>
 
@@ -182,8 +182,8 @@ export function Slide2Visual() {
               </Svg>
             </View>
             <View style={styles.content}>
-              <Text style={[styles.value, { color: 'rgba(22, 26, 6, 1)' }]}>AML</Text>
-              <Text style={[styles.label, { color: 'rgba(22, 26, 6, 0.7)' }]}>Risk & Compliance</Text>
+              <Text style={[styles.value, { color: 'rgba(22, 26, 6, 1)' }]}>BVN</Text>
+              <Text style={[styles.label, { color: 'rgba(22, 26, 6, 0.7)' }]}>Bank Verification</Text>
             </View>
           </Animated.View>
 
@@ -208,8 +208,8 @@ export function Slide2Visual() {
               </Svg>
             </BlurView>
             <View style={styles.content}>
-              <Text style={[styles.value, { color: 'rgba(255, 255, 255, 1)' }]}>KYC</Text>
-              <Text style={[styles.label, { color: 'rgba(255, 255, 255, 0.7)' }]}>Verified Identity</Text>
+              <Text style={[styles.value, { color: 'rgba(255, 255, 255, 1)' }]}>NIN</Text>
+              <Text style={[styles.label, { color: 'rgba(255, 255, 255, 0.7)' }]}>National Identification</Text>
             </View>
           </Animated.View>
 
