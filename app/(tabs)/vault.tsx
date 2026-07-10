@@ -92,7 +92,7 @@ export default function VaultScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.white }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: ds.space.sm, paddingVertical: ds.space.md, paddingHorizontal: ds.space.lg, marginTop: insets.top }}>
-        <BackButton />
+        {/* <BackButton /> */}
         <View
           style={{
             flex: 1,
@@ -160,7 +160,7 @@ export default function VaultScreen() {
         )}
         contentContainerStyle={{
           paddingHorizontal: ds.space.lg,
-          paddingTop: ds.space.lg,
+          paddingTop: ds.space.xs,
           paddingBottom: 140 + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
