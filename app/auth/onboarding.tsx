@@ -71,6 +71,8 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [visualActivationKey, setVisualActivationKey] = useState(0);
+  const [isVisualReady, setIsVisualReady] = useState(false);
   const insets = useSafeAreaInsets();
 
   // Use refs so PanResponder and setTimeout always see the latest values
@@ -150,6 +152,9 @@ export default function OnboardingScreen() {
 
   // Called when typewriter text finishes typing in
   const onTypewriterComplete = useCallback(() => {
+    setIsVisualReady(true);
+    setVisualActivationKey((key) => key + 1);
+
     // Reveal visual, subtitle, and nav elements
     visualOpacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.quad) });
     visualTranslateY.value = withTiming(0, { duration: 600, easing: Easing.out(Easing.cubic) });
@@ -172,6 +177,7 @@ export default function OnboardingScreen() {
 
     // Swap content now that the exit is totally complete
     currentIndexRef.current = nextIndex;
+    setIsVisualReady(false);
     setCurrentIndex(nextIndex);
 
     // Reset positions for entrance (will be triggered by onTypewriterComplete)
@@ -254,7 +260,9 @@ export default function OnboardingScreen() {
   ).current;
 
   const slide = slides[currentIndex];
-  const SlideVisual = slide.Visual;
+  const SlideVisual = slide.Visual as React.ComponentType<{ activationKey?: number; isVisualReady?: boolean }>;
+  const typewriterSpeed = hasEnteredRef.current ? 9 : 14;
+  const typewriterEnterDelay = hasEnteredRef.current ? 35 : 80;
 
   // Animated styles for visual area
   const visualAnimStyle = useAnimatedStyle(() => ({
@@ -306,6 +314,10 @@ export default function OnboardingScreen() {
                 text={slide.title}
                 segments={(slide as any).titleSegments}
                 isActive={!isTransitioning}
+                typingSpeed={typewriterSpeed}
+                enterDelay={typewriterEnterDelay}
+                exitSpeed={5}
+                maxExitDuration={180}
                 onTypeComplete={onTypewriterComplete}
                 onExitComplete={onTypewriterExitComplete}
               />
@@ -316,13 +328,13 @@ export default function OnboardingScreen() {
               )}
             </View>
             <Animated.View style={[styles.visualContainerBottom, visualAnimStyle]}>
-              <SlideVisual />
+              <SlideVisual activationKey={visualActivationKey} isVisualReady={isVisualReady} />
             </Animated.View>
           </>
         ) : (
           <>
             <Animated.View style={[styles.visualContainerTop, { paddingTop: 40 + insets.top }, visualAnimStyle]}>
-              <SlideVisual />
+              <SlideVisual activationKey={visualActivationKey} isVisualReady={isVisualReady} />
             </Animated.View>
             <View style={[styles.textContainerBottom, { paddingBottom: 120 + insets.bottom }]}>
               <TypewriterText
@@ -330,6 +342,10 @@ export default function OnboardingScreen() {
                 text={slide.title}
                 segments={(slide as any).titleSegments}
                 isActive={!isTransitioning}
+                typingSpeed={typewriterSpeed}
+                enterDelay={typewriterEnterDelay}
+                exitSpeed={5}
+                maxExitDuration={180}
                 onTypeComplete={onTypewriterComplete}
                 onExitComplete={onTypewriterExitComplete}
               />

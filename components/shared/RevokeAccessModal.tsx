@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { ASSETS } from '../../utils/assets';
 import { useDesignSystem } from '../../utils/design-system';
 import AppButton from './AppButton';
-import { BodyLargeText, H2Text } from './AppTexts';
+import { BodyLargeText, BodySmallText, H2Text } from './AppTexts';
 import { BottomSheetModal } from './BottomSheetModal';
 
 // Dummy SVG placeholders for logos
@@ -33,6 +34,7 @@ interface RevokeAccessModalProps {
 
 export function RevokeAccessModal({ visible, company, onClose }: RevokeAccessModalProps) {
     const ds = useDesignSystem();
+    const { bottom } = useSafeAreaInsets();
     const [modalState, setModalState] = useState<ModalState>('NONE');
 
     // Reset state when visibility changes
@@ -91,63 +93,99 @@ export function RevokeAccessModal({ visible, company, onClose }: RevokeAccessMod
     );
 
     const isSuccess = modalState === 'SUCCESS';
+    const companyName = company?.name ?? 'This company';
+    const bottomPadding = Math.max(bottom + ds.space.md, ds.space.xl);
+    const partnerLogo = companyName.toLowerCase().includes('paystack') ? <PaystackLogo /> : <FlutterwaveLogo />;
 
     return (
         <BottomSheetModal
             visible={visible}
             onClose={onClose}
-            heightPercentage={isSuccess ? 0.6 : 0.5}
+            heightPercentage={isSuccess ? 0.6 : 0.56}
+            contentStyle={{ backgroundColor: '#F8FAFC' }}
         >
             {modalState === 'CONFIRM' && (
-                <View style={styles.modalBody}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: ds.space.xl }}>
-                        {company?.name.toLowerCase().includes('paystack') ? <PaystackLogo /> : <FlutterwaveLogo />}
-                        <H2Text style={{ marginLeft: ds.space.sm }}>{company?.name}</H2Text>
+                <View style={[styles.modalBody, { paddingBottom: bottomPadding }]}>
+                    <View style={styles.partnerStrip}>
+                        {partnerLogo}
+                        <View style={{ flex: 1 }}>
+                            <BodySmallText style={styles.kicker}>Privacy access</BodySmallText>
+                            <H2Text style={{ fontSize: 20, lineHeight: 25 }}>{companyName}</H2Text>
+                        </View>
+                        <View style={styles.connectedBadge}>
+                            <BodySmallText style={styles.connectedText}>Connected</BodySmallText>
+                        </View>
                     </View>
 
-                    <H2Text style={{ textAlign: 'center', marginBottom: ds.space.xs }}>Revoke Access?</H2Text>
-                    <BodyLargeText style={{ textAlign: 'center', color: Colors.secondaryText, marginBottom: ds.space.xl }}>
-                        This will remove {company?.name}'s access.
-                    </BodyLargeText>
+                    <View style={styles.warningPanel}>
+                        <View style={styles.warningIcon}>
+                            <Ionicons name="shield-outline" size={28} color="#BE123C" />
+                        </View>
+                        <H2Text style={{ textAlign: 'center', fontSize: 22, lineHeight: 28 }}>Revoke data access?</H2Text>
+                        <BodyLargeText style={{ textAlign: 'center', color: 'rgba(5, 21, 14, 0.62)', lineHeight: 22 }}>
+                            This removes {companyName}'s access to the data you previously shared.
+                        </BodyLargeText>
+                    </View>
 
-                    <AppButton
-                        title="Yes, Revoke Access"
-                        onPress={() => setModalState('LOADING')}
-                        style={{ backgroundColor: '#B91C1C', marginBottom: ds.space.md }}
-                        textStyle={{ color: Colors.white }}
-                    />
-                    <AppButton
-                        title="Cancel"
-                        variant="outline"
-                        onPress={onClose}
-                    />
+                    <View style={styles.infoPanel}>
+                        <View style={styles.infoRow}>
+                            <Ionicons name="lock-closed-outline" size={18} color="#166534" />
+                            <BodySmallText style={styles.infoText}>Future requests will require fresh permission.</BodySmallText>
+                        </View>
+                        <View style={styles.infoRow}>
+                            <Ionicons name="trending-up-outline" size={18} color="#166534" />
+                            <BodySmallText style={styles.infoText}>Your Privacy Score may improve after revocation.</BodySmallText>
+                        </View>
+                    </View>
+
+                    <View style={{ marginTop: 'auto', gap: ds.space.md }}>
+                        <AppButton
+                            title="Yes, Revoke Access"
+                            onPress={() => setModalState('LOADING')}
+                            style={{ backgroundColor: '#BE123C', borderRadius: ds.radius.lg }}
+                            textStyle={{ color: Colors.white }}
+                        />
+                        <AppButton
+                            title="Cancel"
+                            variant="outline"
+                            onPress={onClose}
+                            style={{ borderRadius: ds.radius.lg, borderColor: '#E5E7EB' }}
+                            textStyle={{ color: Colors.black }}
+                        />
+                    </View>
                 </View>
             )}
 
             {modalState === 'LOADING' && (
-                <View style={[styles.modalBody, { justifyContent: 'center', alignItems: 'center' }]}>
-                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: ds.space.xl, marginTop: ds.space['4xl'] }}>
+                <View style={[styles.modalBody, { justifyContent: 'center', alignItems: 'center', paddingBottom: bottomPadding }]}>
+                    <View style={styles.warningIcon}>
+                        <Ionicons name="shield-half-outline" size={30} color="#166534" />
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: ds.space.xl, marginTop: ds.space.xl }}>
                         {renderDot(dot1)}
                         {renderDot(dot2)}
                         {renderDot(dot3)}
                         {renderDot(dot4)}
                     </View>
-                    <BodyLargeText>Revoking...</BodyLargeText>
+                    <H2Text style={{ marginBottom: ds.space.xs }}>Revoking access</H2Text>
+                    <BodyLargeText style={{ color: 'rgba(5, 21, 14, 0.62)', textAlign: 'center' }}>
+                        Updating your privacy permissions now.
+                    </BodyLargeText>
                 </View>
             )}
 
             {modalState === 'SUCCESS' && (
-                <View style={[styles.modalBody, { justifyContent: 'center', alignItems: 'center', paddingTop: ds.space.lg }]}>
+                <View style={[styles.modalBody, { justifyContent: 'center', alignItems: 'center', paddingTop: ds.space.lg, paddingBottom: bottomPadding }]}>
                     <ASSETS.AUTH.VERIFICATION_SUCCESS width={120} height={120} style={{ marginBottom: ds.space.lg }} />
                     <H2Text style={{ textAlign: 'center', marginBottom: ds.space.xs }}>Access Revoked</H2Text>
-                    <BodyLargeText style={{ textAlign: 'center', color: Colors.secondaryText, marginBottom: ds.space.xl }}>
-                        {company?.name} no longer has access.{'\n'}Your Privacy Score improved by +5 pts
+                    <BodyLargeText style={{ textAlign: 'center', color: 'rgba(5, 21, 14, 0.62)', marginBottom: ds.space.xl, lineHeight: 22 }}>
+                        {companyName} no longer has access.{'\n'}Your Privacy Score improved by +5 pts
                     </BodyLargeText>
 
                     <AppButton
                         title="Done"
                         onPress={onClose}
-                        style={{ backgroundColor: Colors.black, width: '100%' }}
+                        style={{ backgroundColor: Colors.black, width: '100%', borderRadius: ds.radius.lg }}
                         textStyle={{ color: Colors.white }}
                     />
                 </View>
@@ -158,8 +196,72 @@ export function RevokeAccessModal({ visible, company, onClose }: RevokeAccessMod
 
 const styles = StyleSheet.create({
     modalBody: {
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingTop: 10,
         flex: 1,
+    },
+    partnerStrip: {
+        minHeight: 70,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        borderRadius: 18,
+        backgroundColor: Colors.white,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingHorizontal: 14,
+        marginBottom: 18,
+    },
+    kicker: {
+        color: 'rgba(5, 21, 14, 0.48)',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    connectedBadge: {
+        paddingHorizontal: 9,
+        paddingVertical: 5,
+        borderRadius: 999,
+        backgroundColor: '#ECFDF3',
+        borderWidth: 1,
+        borderColor: '#BBF7D0',
+    },
+    connectedText: {
+        color: '#166534',
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    warningPanel: {
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 16,
+    },
+    warningIcon: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#FFF1F2',
+        borderWidth: 1,
+        borderColor: '#FECDD3',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    infoPanel: {
+        borderRadius: 18,
+        backgroundColor: Colors.white,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        padding: 14,
+        gap: 10,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    infoText: {
+        flex: 1,
+        color: 'rgba(5, 21, 14, 0.62)',
+        lineHeight: 18,
     },
     loadingDot: {
         width: 8,

@@ -115,7 +115,7 @@ export default function HomeScreen() {
             <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 18 }}>Welcome Back</BodySmallText>
             <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 34, marginTop: 4, color: ds.colors.mainText }}>Gracious</BodyLargeText>
           </View>
-          <TouchableOpacity style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : ds.colors.white, padding: ds.space.sm, borderRadius: ds.radius.full, shadowColor: ds.colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 3, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'transparent' }} onPress={() => router.push('/(screens)/notifications')}>
+          <TouchableOpacity style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : ds.colors.white, padding: ds.space.sm, borderRadius: ds.radius.full, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(226, 232, 240, 1)' }} onPress={() => router.push('/(screens)/notifications')}>
             <ASSETS.ICONS.NOTIFICATION_ICON width={24} height={24} />
           </TouchableOpacity>
         </View>
@@ -130,22 +130,26 @@ export default function HomeScreen() {
             }
 
             const colors = renderColors()
+            const activityIcon = item.status === "Verified" ? "check-circle" : item.status === "Pending" ? "clock" : "x-circle"
 
             const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
             return (
               <AnimatedTouchableOpacity
                 entering={FadeInUp.delay(index * 100).duration(400)}
-                style={{ flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.xl, borderColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(226, 232, 240, 1)", borderWidth: 1 }}>
-                <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : "rgba(248, 250, 252, 1)", padding: ds.space.sm, borderRadius: ds.radius.lg, borderWidth: 1, borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(226, 232, 240, 1)" }}>
-                  <ASSETS.ICONS.HOME_RECENT_ACTIVITY />
+                style={{ minHeight: 74, flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.lg, borderColor: colors?.border, borderWidth: 1 }}>
+                <View style={{ backgroundColor: colors?.bg, width: 44, height: 44, borderRadius: ds.radius.full, justifyContent: "center", alignItems: "center", borderWidth: 1, borderColor: colors?.border }}>
+                  <Feather name={activityIcon} size={20} color={colors?.text} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <BodyLargeText style={{ fontFamily: Fonts.medium, color: ds.colors.mainText }}>{item.title}</BodyLargeText>
-                  <BodySmallText style={{ color: ds.colors.secondaryText, marginTop: 2 }}>{item.date}</BodySmallText>
+                <View style={{ flex: 1, gap: 3 }}>
+                  <BodyLargeText style={{ fontFamily: Fonts.semiBold, color: ds.colors.mainText, fontSize: 15 }}>{item.title}</BodyLargeText>
+                  <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 12 }}>{item.date}</BodySmallText>
                 </View>
-                <View style={{ flexDirection: "row", backgroundColor: colors?.bg, borderColor: colors?.border, borderWidth: 1, paddingHorizontal: ds.space.sm, paddingVertical: 6, justifyContent: "center", alignItems: "center", borderRadius: ds.radius.full, gap: 6 }}>
-                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors?.dot }} />
-                  <BodySmallText style={{ color: colors?.text, fontFamily: Fonts.medium }} size={12}>{item.status}</BodySmallText>
+                <View style={{ alignItems: "flex-end", gap: 6 }}>
+                  <View style={{ flexDirection: "row", backgroundColor: colors?.bg, borderColor: colors?.border, borderWidth: 1, paddingHorizontal: ds.space.sm, paddingVertical: 5, justifyContent: "center", alignItems: "center", borderRadius: ds.radius.full, gap: 6 }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors?.dot }} />
+                    <BodySmallText style={{ color: colors?.text, fontFamily: Fonts.bold, fontSize: 11 }}>{item.status}</BodySmallText>
+                  </View>
+                  <Feather name="arrow-right" size={16} color={ds.colors.secondaryText} />
                 </View>
               </AnimatedTouchableOpacity>
             )

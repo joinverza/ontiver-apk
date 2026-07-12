@@ -37,9 +37,9 @@ export default function RevokeSharesScreen() {
                 {/* Search and Calendar */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: ds.space.lg, gap: ds.space.md }}>
                     <View style={styles.searchContainer}>
-                        <Ionicons name="search" size={20} color={Colors.secondaryText} style={styles.searchIcon} />
+                        <Ionicons name="search" size={18} color={Colors.secondaryText} style={styles.searchIcon} />
                         <TextInput
-                            style={[styles.searchInput, { fontFamily: ds.typography.bodyLarge.fontFamily }]}
+                            style={[styles.searchInput, { fontFamily: ds.typography.bodyLarge.fontFamily, fontSize: Math.max(ds.typography.bodySmall.fontSize - 1, 12) }]}
                             placeholder="Search old shares..."
                             value={searchQuery}
                             onChangeText={setSearchQuery}
@@ -47,12 +47,12 @@ export default function RevokeSharesScreen() {
                         />
                         {searchQuery.length > 0 && (
                             <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                <Ionicons name="close" size={20} color={Colors.black} />
+                                <Ionicons name="close" size={18} color={Colors.black} />
                             </TouchableOpacity>
                         )}
                     </View>
                     <TouchableOpacity style={styles.calendarButton}>
-                        <Feather name="calendar" size={20} color={Colors.black} />
+                        <Feather name="calendar" size={18} color={Colors.black} />
                     </TouchableOpacity>
                 </View>
 
@@ -216,9 +216,9 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: '#E5E7EB',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        height: 48,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 44,
     },
     searchIcon: {
         marginRight: 8,
@@ -229,12 +229,12 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
     calendarButton: {
-        width: 48,
-        height: 48,
+        width: 44,
+        height: 44,
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: '#E5E7EB',
-        borderRadius: 12,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
     },

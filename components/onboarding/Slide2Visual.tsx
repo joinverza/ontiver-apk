@@ -51,7 +51,24 @@ function cardPath(w: number, h: number, r: number) {
 
 const pathD = cardPath(CARD_W, CARD_H, R);
 
-export function Slide2Visual() {
+interface Slide2VisualProps {
+  activationKey?: number;
+  isVisualReady?: boolean;
+}
+
+function BvnBadgeIcon() {
+  return (
+    <Svg viewBox="0 0 32 32" fill="none" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+      <Path d="M5 12.4L16 6.2l11 6.2V15H5v-2.6Z" fill="#E7FFEA" stroke="#194A12" strokeWidth="2" />
+      <Path d="M8 15v8M13.3 15v8M18.7 15v8M24 15v8" stroke="#194A12" strokeWidth="2" />
+      <Path d="M5.5 24h21M7.5 27h17" stroke="#194A12" strokeWidth="2" />
+      <Path d="M12 20.3c.8-1.7 2.1-2.6 4-2.6s3.2.9 4 2.6" stroke="#5F7F00" strokeWidth="1.7" />
+      <Path d="M14 22.4c.5-.7 1.1-1.1 2-1.1s1.5.4 2 1.1" stroke="#5F7F00" strokeWidth="1.7" />
+    </Svg>
+  );
+}
+
+export function Slide2Visual({ activationKey = 0, isVisualReady = false }: Slide2VisualProps) {
   // We want the front card (slot 2) to be on the bottom of the screen (highest Y).
   // Slot 0 (top of screen, lowest Y) will be in the back (zIndex 1).
   // Slot 1 (middle of screen) will be in the middle (zIndex 2).
@@ -71,11 +88,33 @@ export function Slide2Visual() {
   const c3Mounted = useSharedValue(0);
   const pressScale = useSharedValue(1);
 
+  const playStackEntrance = React.useCallback(() => {
+    c1Slot.value = 2;
+    c2Slot.value = 1;
+    c3Slot.value = 0;
+    c1ZIndex.value = 3;
+    c2ZIndex.value = 2;
+    c3ZIndex.value = 1;
+    c1Mounted.value = 0;
+    c2Mounted.value = 0;
+    c3Mounted.value = 0;
+    pressScale.value = 1;
+
+    c3Mounted.value = withDelay(80, withTiming(1, { duration: 520, easing: Easing.out(Easing.back(1.35)) }));
+    c2Mounted.value = withDelay(190, withTiming(1, { duration: 520, easing: Easing.out(Easing.back(1.35)) }));
+    c1Mounted.value = withDelay(310, withTiming(1, { duration: 520, easing: Easing.out(Easing.back(1.35)) }));
+  }, [c1Mounted, c1Slot, c1ZIndex, c2Mounted, c2Slot, c2ZIndex, c3Mounted, c3Slot, c3ZIndex, pressScale]);
+
   React.useEffect(() => {
-    c3Mounted.value = withDelay(400, withTiming(1, { duration: 600, easing: Easing.out(Easing.back(1.5)) }));
-    c2Mounted.value = withDelay(600, withTiming(1, { duration: 600, easing: Easing.out(Easing.back(1.5)) }));
-    c1Mounted.value = withDelay(800, withTiming(1, { duration: 600, easing: Easing.out(Easing.back(1.5)) }));
-  }, []);
+    if (!isVisualReady) {
+      c1Mounted.value = 0;
+      c2Mounted.value = 0;
+      c3Mounted.value = 0;
+      return;
+    }
+
+    playStackEntrance();
+  }, [activationKey, c1Mounted, c2Mounted, c3Mounted, isVisualReady, playStackEntrance]);
 
   const handlePressIn = () => {
     pressScale.value = withTiming(1.04, { duration: 150, easing: Easing.out(Easing.ease) });
@@ -170,16 +209,13 @@ export function Slide2Visual() {
             </View>
           </Animated.View>
 
-          {/* Card 2: Middle -> Lime (Health Record) */}
+          {/* Card 2: Middle -> Lime (Bank Verification) */}
         <Animated.View style={[styles.card, getStyle(c2Slot, c2ZIndex, c2Mounted)]}>
           <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 ${CARD_W} ${CARD_H}`}>
             <Path d={pathD} fill="#00ff40" />
           </Svg>
           <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
-              <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
-                <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#8a9c00" />
-                <Path d="M9 12l2 2 4-4" stroke="#8a9c00" />
-              </Svg>
+              <BvnBadgeIcon />
             </View>
             <View style={styles.content}>
               <Text style={[styles.value, { color: 'rgba(22, 26, 6, 1)' }]}>BVN</Text>
@@ -189,16 +225,16 @@ export function Slide2Visual() {
 
           {/* Card 1: Front -> Dark (Digital Identity) */}
         <Animated.View style={[styles.card, getStyle(c1Slot, c1ZIndex, c1Mounted)]}>
-          <MaskedView
+          {/* <MaskedView
             style={StyleSheet.absoluteFill}
-            maskElement={
+            maskElement={ */}
               <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 ${CARD_W} ${CARD_H}`}>
-                <Path d={pathD} fill="black" />
+                <Path d={pathD} fill="#000000" />
               </Svg>
-            }
-          >
-            <BlurView intensity={1000} tint="dark" style={StyleSheet.absoluteFill} />
-          </MaskedView>
+            {/* }
+          > */}
+            {/* <BlurView intensity={1000} tint="dark" style={StyleSheet.absoluteFill} /> */}
+          {/* </MaskedView> */}
           <BlurView intensity={10} tint="light" style={[styles.badge, { overflow: 'hidden' }]}>
               <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
                 <Rect x="2" y="4" width="20" height="16" rx="2" stroke="#ffffff" />

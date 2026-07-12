@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useDesignSystem } from '../../utils/design-system';
 
@@ -7,28 +7,97 @@ interface HomeBannerSliderProps {
   data: { image: any; onPress: () => void }[];
 }
 
+const AUTO_SCROLL_INTERVAL_MS = 2000;
+const MANUAL_RESUME_DELAY_MS = 2000;
+
 export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
   const ds = useDesignSystem();
   const [activeSlider, setActiveSlider] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const activeSliderRef = useRef(0);
+  const isUserInteractingRef = useRef(false);
+  const autoScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const itemWidth = ds.width * 0.9;
+  const snapInterval = itemWidth + ds.space.lg;
+
+  const clearAutoScroll = useCallback(() => {
+    if (autoScrollTimeoutRef.current) {
+      clearTimeout(autoScrollTimeoutRef.current);
+      autoScrollTimeoutRef.current = null;
+    }
+  }, []);
+
+  const clearResumeTimer = useCallback(() => {
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+      resumeTimeoutRef.current = null;
+    }
+  }, []);
+
+  const setActiveIndex = useCallback((index: number) => {
+    const boundedIndex = Math.max(0, Math.min(index, Math.max(data.length - 1, 0)));
+
+    if (activeSliderRef.current !== boundedIndex) {
+      activeSliderRef.current = boundedIndex;
+      setActiveSlider(boundedIndex);
+    }
+  }, [data.length]);
+
+  const scrollToBanner = useCallback((index: number, animated = true) => {
+    flatListRef.current?.scrollToOffset({
+      offset: index * snapInterval,
+      animated,
+    });
+  }, [snapInterval]);
+
+  const scheduleAutoScroll = useCallback((delay = AUTO_SCROLL_INTERVAL_MS) => {
+    clearAutoScroll();
+
+    if (data.length <= 1) {
+      return;
+    }
+
+    autoScrollTimeoutRef.current = setTimeout(() => {
+      if (isUserInteractingRef.current) {
+        scheduleAutoScroll(MANUAL_RESUME_DELAY_MS);
+        return;
+      }
+
+      const nextIndex = (activeSliderRef.current + 1) % data.length;
+      setActiveIndex(nextIndex);
+      scrollToBanner(nextIndex);
+      scheduleAutoScroll(AUTO_SCROLL_INTERVAL_MS);
+    }, delay);
+  }, [clearAutoScroll, data.length, scrollToBanner, setActiveIndex]);
+
+  const updateActiveIndexFromOffset = useCallback((offset: number) => {
+    setActiveIndex(Math.round(offset / snapInterval));
+  }, [setActiveIndex, snapInterval]);
+
+  const pauseAutoScrollForManualInteraction = useCallback(() => {
+    isUserInteractingRef.current = true;
+    clearAutoScroll();
+    clearResumeTimer();
+  }, [clearAutoScroll, clearResumeTimer]);
+
+  const resumeAutoScrollAfterManualInteraction = useCallback(() => {
+    clearResumeTimer();
+    resumeTimeoutRef.current = setTimeout(() => {
+      isUserInteractingRef.current = false;
+      scheduleAutoScroll(AUTO_SCROLL_INTERVAL_MS);
+    }, MANUAL_RESUME_DELAY_MS);
+  }, [clearResumeTimer, scheduleAutoScroll]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSlider((prevActiveSlider) => {
-        let nextIndex = prevActiveSlider + 1;
-        if (nextIndex >= data.length) {
-          nextIndex = 0;
-        }
-        flatListRef.current?.scrollToOffset({
-          offset: nextIndex * (ds.width * 0.9 + ds.space.lg),
-          animated: true,
-        });
-        return nextIndex;
-      });
-    }, 3000);
+    scheduleAutoScroll();
 
-    return () => clearInterval(interval);
-  }, [data.length, ds.width, ds.space.lg]);
+    return () => {
+      clearAutoScroll();
+      clearResumeTimer();
+    };
+  }, [clearAutoScroll, clearResumeTimer, scheduleAutoScroll]);
 
   return (
     <View style={{ gap: ds.space.lg }}>
@@ -38,7 +107,7 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
         renderItem={({ item }) => {
           const SvgImage = item.image;
           return (
-            <TouchableOpacity onPress={item.onPress} style={{ width: ds.width * 0.9, borderRadius: ds.space.md, overflow: 'hidden' }}>
+            <TouchableOpacity onPress={item.onPress} style={{ width: itemWidth, borderRadius: ds.space.md, overflow: 'hidden' }}>
               <SvgImage width="100%" height={ds.width * 0.4} />
             </TouchableOpacity>
           );
@@ -46,11 +115,20 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
         horizontal
         showsHorizontalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ width: ds.space.lg }} />}
-        snapToInterval={ds.width * 0.9 + ds.space.lg}
+        snapToInterval={snapInterval}
         decelerationRate="fast"
         onScroll={(e) => {
-          const index = Math.round(e.nativeEvent.contentOffset.x / (ds.width * 0.9 + ds.space.lg));
-          setActiveSlider(index);
+          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+        }}
+        onScrollBeginDrag={pauseAutoScrollForManualInteraction}
+        onMomentumScrollBegin={pauseAutoScrollForManualInteraction}
+        onScrollEndDrag={(e) => {
+          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+          resumeAutoScrollAfterManualInteraction();
+        }}
+        onMomentumScrollEnd={(e) => {
+          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+          resumeAutoScrollAfterManualInteraction();
         }}
         scrollEventThrottle={16}
       />

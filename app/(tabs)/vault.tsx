@@ -1,18 +1,214 @@
-import AppButton from '@/components/shared/AppButton';
-import { BodyLargeText, BodySmallText } from '@/components/shared/AppTexts';
-import BackButton from '@/components/shared/BackButton';
+import { BottomSheetModal } from '@/components/shared/BottomSheetModal';
+import { BodyLargeText, BodySmallText, H2Text, Label } from '@/components/shared/AppTexts';
+import { CredentialCard } from '@/components/shared/CredentialCard';
 import { FilterTabs } from '@/components/shared/FilterTabs';
+import { VaultCredentialDetailsDrawer, type VaultCredentialItem } from '@/components/shared/VaultCredentialDetailsDrawer';
 import { Fonts } from '@/constants/fonts';
+import { useDesignSystem } from '@/utils/design-system';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import { SectionList, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { Colors } from '../../constants/Colors';
-import { useDesignSystem } from '../../utils/design-system';
-import { CredentialCard } from '../../components/shared/CredentialCard';
-import { BottomSheetModal } from '../../components/shared/BottomSheetModal';
+
+function VaultPass({ totalCredentials }: { totalCredentials: number }) {
+  const ds = useDesignSystem();
+
+  return (
+    <View
+      style={{
+        minHeight: 74,
+        borderTopLeftRadius: ds.radius.lg,
+        borderTopRightRadius: ds.radius.lg,
+        backgroundColor: Colors.white,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        paddingHorizontal: ds.space.lg,
+        paddingVertical: ds.space.lg,
+        justifyContent: 'center',
+      }}
+    >
+      <Svg width="142" height="78" viewBox="0 0 142 78" style={{ position: 'absolute', right: 62, top: -4 }} fill="none">
+        {Array.from({ length: 9 }).map((_, index) => (
+          <Path
+            key={index}
+            d={`M${14 + index * 8} -6 C${34 + index * 8} 18 ${27 + index * 8} 48 ${50 + index * 8} 84`}
+            stroke="rgba(5, 21, 14, 0.08)"
+            strokeWidth="1"
+          />
+        ))}
+      </Svg>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: ds.space.md }}>
+        <View style={{ flex: 1, gap: 3 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 18, color: '#05150E' }}>Vault Pass</BodyLargeText>
+            <Feather name="chevron-right" size={15} color="rgba(5,21,14,0.42)" />
+          </View>
+          <BodySmallText style={{ color: 'rgba(5,21,14,0.52)', fontSize: 11 }}>Credentials are encrypted and ready to share</BodySmallText>
+        </View>
+        <View style={{ alignItems: 'flex-end', gap: 3 }}>
+          <BodySmallText style={{ color: 'rgba(5,21,14,0.46)', fontFamily: Fonts.medium, fontSize: 10 }}>**** **** **** {String(totalCredentials).padStart(3, '0')}</BodySmallText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <BodyLargeText style={{ color: '#166534', fontFamily: Fonts.bold, fontSize: 18 }}>{totalCredentials}</BodyLargeText>
+            <View style={{ paddingHorizontal: 7, paddingVertical: 3, borderRadius: ds.radius.full, backgroundColor: '#ECFDF3' }}>
+              <BodySmallText style={{ color: '#166534', fontFamily: Fonts.bold, fontSize: 9 }}>SECURE</BodySmallText>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function VaultMetricTile({
+  title,
+  value,
+  detail,
+  icon,
+  color,
+  bg,
+  compact,
+  wide,
+}: {
+  title: string;
+  value: string;
+  detail: string;
+  icon: keyof typeof Feather.glyphMap;
+  color: string;
+  bg: string;
+  compact?: boolean;
+  wide?: boolean;
+}) {
+  const ds = useDesignSystem();
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        minHeight: wide ? 112 : compact ? 86 : 160,
+        borderRadius: ds.radius.lg,
+        backgroundColor: Colors.white,
+        padding: ds.space.md,
+        justifyContent: 'space-between',
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: `${color}30`,
+      }}
+    >
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: ds.space.sm }}>
+        <View
+          style={{
+            width: compact ? 32 : 42,
+            height: compact ? 32 : 42,
+            borderRadius: ds.radius.full,
+            backgroundColor: bg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Feather name={icon} size={compact ? 17 : 22} color={color} />
+        </View>
+        {wide ? (
+          <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: ds.radius.full, backgroundColor: bg }}>
+            <BodySmallText style={{ color, fontFamily: Fonts.bold, fontSize: 10 }}>Protected</BodySmallText>
+          </View>
+        ) : !compact ? (
+          <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: ds.radius.full, backgroundColor: '#F8FAFC' }}>
+            <BodySmallText style={{ color: 'rgba(5,21,14,0.54)', fontFamily: Fonts.medium, fontSize: 10 }}>Vault</BodySmallText>
+          </View>
+        ) : null}
+      </View>
+      <View style={{ gap: compact ? 1 : 5 }}>
+        <BodySmallText style={{ color: 'rgba(5,21,14,0.5)', fontFamily: Fonts.medium, fontSize: compact ? 10 : 12 }}>{title}</BodySmallText>
+        <H2Text style={{ color: '#05150E', fontFamily: Fonts.bold, fontSize: compact ? 19 : 32, lineHeight: compact ? 23 : 36 }}>{value}</H2Text>
+        <BodySmallText numberOfLines={compact ? 1 : 2} style={{ color, fontFamily: Fonts.semiBold, fontSize: compact ? 11 : 12 }}>
+          {detail}
+        </BodySmallText>
+      </View>
+    </View>
+  );
+}
+
+function VaultMetricGrid({ total, verified, pending }: { total: number; verified: number; pending: number }) {
+  const ds = useDesignSystem();
+
+  return (
+    <View style={{ gap: ds.space.md }}>
+      <VaultMetricTile title="In vault" value={String(total)} detail="Total credentials stored safely" icon="database" color="#166534" bg="#ECFDF3" wide />
+      <View style={{ flexDirection: 'row', gap: ds.space.md }}>
+        <VaultMetricTile title="Verified" value={String(verified)} detail="Ready to share" icon="check-circle" color="#0E7490" bg="#ECFEFF" compact />
+        <VaultMetricTile title="Pending" value={String(pending)} detail="Needs review" icon="clock" color="#C2410C" bg="#FFF7ED" compact />
+      </View>
+    </View>
+  );
+}
+
+function VaultStickyControls({
+  searchQuery,
+  setSearchQuery,
+  tabs,
+  activeTab,
+  onTabChange,
+  shownCount,
+}: {
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  tabs: string[];
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  shownCount: number;
+}) {
+  const ds = useDesignSystem();
+
+  return (
+    <View style={{ backgroundColor: '#F8FAFC', paddingTop: ds.space.sm, paddingBottom: ds.space.sm }}>
+      <View
+        style={{
+          height: 46,
+          backgroundColor: Colors.white,
+          borderRadius: ds.radius.md,
+          paddingHorizontal: ds.space.md,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderColor: '#E5E7EB',
+          borderWidth: 1,
+          marginBottom: ds.space.md,
+        }}
+      >
+        <Feather name="search" size={18} color="rgba(5,21,14,0.42)" />
+        <TextInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search vault"
+          placeholderTextColor="rgba(5,21,14,0.42)"
+          style={{
+            flex: 1,
+            height: '100%',
+            fontFamily: Fonts.regular,
+            fontSize: Math.max(ds.typography.bodySmall.fontSize - 1, 12),
+            color: Colors.black,
+            paddingHorizontal: ds.space.sm,
+            paddingVertical: 0,
+          }}
+        />
+        <TouchableOpacity onPress={() => setSearchQuery('')} disabled={!searchQuery} style={{ padding: ds.space.xs }}>
+          <Feather name="x" size={17} color={searchQuery ? 'rgba(5,21,14,0.58)' : 'rgba(5,21,14,0.2)'} />
+        </TouchableOpacity>
+      </View>
+
+      <FilterTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: ds.space.md }}>
+        <Label style={{ flex: 1, color: 'rgba(5,21,14,0.58)' }}>Credentials</Label>
+        <BodySmallText style={{ color: Colors.primary, fontFamily: Fonts.bold }}>{shownCount} shown</BodySmallText>
+      </View>
+    </View>
+  );
+}
 
 export default function VaultScreen() {
   const ds = useDesignSystem();
@@ -21,13 +217,12 @@ export default function VaultScreen() {
   const { credentialId, openCredentialAt } = useLocalSearchParams<{ credentialId?: string; openCredentialAt?: string }>();
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState<VaultCredentialItem | null>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const tabs = ['All', 'Verified', 'Pending 05', 'Expired'];
 
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const data = [
+  const data: VaultCredentialItem[] = [
     {
       id: '1',
       label: 'NIN',
@@ -36,7 +231,8 @@ export default function VaultScreen() {
       status: 'Verified',
       date: '15th April, 2026',
       bgColor: '#e4e4e4',
-      credentialType: 'kyc' as const,
+      credentialType: 'kyc',
+      backgroundLogoType: 'national_id',
     },
     {
       id: '2',
@@ -46,7 +242,8 @@ export default function VaultScreen() {
       status: 'Verified',
       date: '15th April, 2026',
       bgColor: '#e4e4e4',
-      credentialType: 'aml' as const,
+      credentialType: 'aml',
+      backgroundLogoType: 'aml',
     },
     {
       id: '3',
@@ -56,11 +253,15 @@ export default function VaultScreen() {
       status: 'Pending',
       date: '15th April, 2026',
       bgColor: '#e4e4e4',
-      credentialType: 'kyb' as const,
+      credentialType: 'kyb',
+      backgroundLogoType: 'passport',
     },
   ];
 
-  const handleItemPress = (item: any) => {
+  const verifiedCount = data.filter((item) => item.status === 'Verified').length;
+  const pendingCount = data.filter((item) => item.status === 'Pending').length;
+
+  const handleItemPress = (item: VaultCredentialItem) => {
     setSelectedItem(item);
     setModalVisible(true);
   };
@@ -88,51 +289,16 @@ export default function VaultScreen() {
 
     return matchesTab && matchesSearch;
   });
+  const sections = [{ title: 'Credentials', data: filteredData }];
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.white }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: ds.space.sm, paddingVertical: ds.space.md, paddingHorizontal: ds.space.lg, marginTop: insets.top }}>
-        {/* <BackButton /> */}
-        <View
-          style={{
-            flex: 1,
-            height: 56,
-            backgroundColor: Colors.white,
-            borderRadius: ds.radius.md,
-            paddingHorizontal: ds.space.md,
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderColor: '#D1D5DB',
-            borderWidth: 1,
-          }}
-        >
-          <Feather name="search" size={20} color="rgba(0, 0, 0, 0.4)" />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder='Search Vault'
-            placeholderTextColor={"rgba(0, 0, 0, 0.4)"}
-            style={{
-              flex: 1,
-              height: '100%',
-              fontFamily: Fonts.regular,
-              fontSize: ds.typography.bodySmall.fontSize,
-              color: Colors.black,
-              paddingHorizontal: ds.space.sm,
-              paddingVertical: 0,
-            }}
-          />
-          <TouchableOpacity onPress={() => setSearchQuery('')} disabled={!searchQuery}>
-            <Feather name="x" size={20} color={searchQuery ? "rgba(0, 0, 0, 0.55)" : "rgba(0, 0, 0, 0.22)"} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <FlatList
-        data={filteredData}
+    <View style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: insets.top + ds.space.lg }}>
+      <SectionList
+        sections={sections}
         keyExtractor={(item) => item.id}
+        stickySectionHeadersEnabled
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInUp.delay(index * 100).duration(400)}>
+          <Animated.View entering={FadeInUp.delay(index * 80).duration(320)}>
             <TouchableOpacity
               activeOpacity={0.88}
               onPress={() => handleItemPress(item)}
@@ -144,6 +310,8 @@ export default function VaultScreen() {
                 bgColor={item.bgColor}
                 credentialType={item.credentialType}
                 status={item.status}
+                showBackgroundLogo
+                backgroundLogoType={item.backgroundLogoType}
                 width={ds.width - ds.space.lg * 2}
                 height={158}
               />
@@ -151,101 +319,98 @@ export default function VaultScreen() {
           </Animated.View>
         )}
         ListHeaderComponent={() => (
-          <View style={{ marginBottom: ds.space.md }}>
-            <FilterTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+          <Animated.View entering={FadeInDown.duration(340)} style={{ gap: ds.space.lg, paddingBottom: ds.space.lg }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: ds.space.md }}>
+              <View style={{ flex: 1, gap: 4 }}>
+                <BodySmallText style={{ color: 'rgba(5,21,14,0.52)', fontFamily: Fonts.medium }}>Secure credentials</BodySmallText>
+                <H2Text style={{ color: Colors.mainText, fontFamily: Fonts.bold, fontSize: 31, lineHeight: 36 }}>My Vault</H2Text>
+              </View>
+              <View
+                style={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: ds.radius.full,
+                  backgroundColor: Colors.white,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB',
+                }}
+              >
+                <Feather name="lock" size={20} color={Colors.primary} />
+              </View>
+            </View>
+
+            <VaultPass totalCredentials={data.length} />
+
+            <VaultMetricGrid total={data.length} verified={verifiedCount} pending={pendingCount} />
+          </Animated.View>
+        )}
+        renderSectionHeader={() => (
+          <VaultStickyControls
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            shownCount={filteredData.length}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View style={{ paddingVertical: ds.space['5xl'], alignItems: 'center', gap: ds.space.sm }}>
+            <View
+              style={{
+                width: 54,
+                height: 54,
+                borderRadius: ds.radius.full,
+                backgroundColor: '#ECFDF3',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Feather name="search" size={22} color={Colors.primary} />
+            </View>
+            <BodyLargeText style={{ fontFamily: Fonts.bold, color: Colors.mainText }}>No credentials found</BodyLargeText>
+            <BodySmallText style={{ color: 'rgba(5,21,14,0.52)', textAlign: 'center' }}>Try another search term or status filter.</BodySmallText>
           </View>
         )}
-        ItemSeparatorComponent={() => (
-          <View style={{ height: ds.space.md }} />
-        )}
+        ItemSeparatorComponent={() => <View style={{ height: ds.space.lg }} />}
         contentContainerStyle={{
           paddingHorizontal: ds.space.lg,
-          paddingTop: ds.space.xs,
           paddingBottom: 140 + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Floating Action Button */}
       <Animated.View
         entering={FadeInUp.delay(500).springify()}
-        style={{ position: "absolute", bottom: ds.space['7xl'] + insets.bottom + ds.space.lg, right: ds.space.xl, zIndex: 100 }}
+        style={{ position: 'absolute', bottom: ds.space['7xl'] + insets.bottom + ds.space.lg, right: ds.space.xl, zIndex: 100 }}
       >
         <TouchableOpacity
-          style={{ backgroundColor: Colors.primary, width: 64, height: 64, borderRadius: 32, justifyContent: "center", alignItems: "center", shadowColor: Colors.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
-          onPress={() => router.push('/(screens)/add-credential')}>
+          style={{ backgroundColor: Colors.primary, width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', shadowColor: Colors.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
+          onPress={() => router.push('/(screens)/add-credential')}
+        >
           <Feather name="plus" size={32} color={Colors.white} />
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Credential Details Bottom Sheet Modal */}
       <BottomSheetModal
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        heightPercentage={0.55}
+        heightPercentage={0.68}
+        contentStyle={{ backgroundColor: '#F8FAFC' }}
       >
         {selectedItem && (
-          <>
-            <View style={{ alignItems: 'center', marginTop: ds.space.md, marginBottom: ds.space.xl }}>
-              <View style={{
-                paddingHorizontal: ds.space.md,
-                paddingVertical: 4,
-                borderRadius: ds.radius.full,
-                backgroundColor: selectedItem.status === 'Verified' ? 'rgba(208, 255, 221, 1)' : 'rgba(255, 230, 208, 1)',
-                marginBottom: ds.space.md,
-              }}>
-                <BodySmallText style={{
-                  color: selectedItem.status === 'Verified' ? 'rgba(0, 125, 33, 1)' : 'rgba(170, 81, 2, 1)',
-                  fontSize: 10,
-                  fontFamily: Fonts.medium
-                }}>{selectedItem.status}</BodySmallText>
-              </View>
-              <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 20 }}>{selectedItem.title}</BodyLargeText>
-              <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.5)', marginTop: 4, fontFamily: Fonts.medium }}>{selectedItem.country} • {selectedItem.date}</BodySmallText>
-            </View>
-
-            <View style={{
-              backgroundColor: '#F9FAFB',
-              borderRadius: ds.radius.xl,
-              padding: ds.space.lg,
-              borderColor: '#E5E7EB',
-              borderWidth: 1,
-            }}>
-              <View style={{ marginBottom: ds.space.md }}>
-                <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 14 }}>Document Type</BodyLargeText>
-                <BodySmallText style={{ marginTop: 2, color: 'rgba(5, 21, 14, 0.8)' }}>{selectedItem.label}</BodySmallText>
-                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginTop: ds.space.sm }} />
-              </View>
-              <View style={{ marginBottom: ds.space.md }}>
-                <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 14 }}>Full Name</BodyLargeText>
-                <BodySmallText style={{ marginTop: 2, color: 'rgba(5, 21, 14, 0.8)' }}>Lawrence Gracious Paul</BodySmallText>
-                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginTop: ds.space.sm }} />
-              </View>
-              <View style={{ marginBottom: ds.space.md }}>
-                <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 14 }}>Country</BodyLargeText>
-                <BodySmallText style={{ marginTop: 2, color: 'rgba(5, 21, 14, 0.8)' }}>{selectedItem.country}</BodySmallText>
-                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginTop: ds.space.sm }} />
-              </View>
-              <View>
-                <BodyLargeText style={{ fontFamily: Fonts.semiBold, fontSize: 14 }}>Date Issued</BodyLargeText>
-                <BodySmallText style={{ marginTop: 2, color: 'rgba(5, 21, 14, 0.8)' }}>{selectedItem.date}</BodySmallText>
-              </View>
-            </View>
-
-            <View style={{ paddingVertical: ds.space.lg }}>
-              <AppButton
-                title="View Full Details"
-                onPress={() => {
-                  setModalVisible(false);
-                  router.push('/(screens)/credential-details');
-                }}
-                style={{ borderRadius: ds.radius.lg }}
-              />
-            </View>
-          </>
+          <VaultCredentialDetailsDrawer
+            item={selectedItem}
+            bottomInset={Math.max(insets.bottom + ds.space.md, ds.space.xl)}
+            onViewFullDetails={() => {
+              setModalVisible(false);
+              router.push('/(screens)/credential-details');
+            }}
+          />
         )}
       </BottomSheetModal>
     </View>
   );
 }
-

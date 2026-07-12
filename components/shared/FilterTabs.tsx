@@ -15,7 +15,7 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({ tabs, activeTab, onTabCh
     const ds = useDesignSystem();
 
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: ds.space.lg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: ds.space.md }}>
             <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false} 
@@ -29,15 +29,15 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({ tabs, activeTab, onTabCh
                             key={tab}
                             onPress={() => onTabChange(tab)}
                             style={{
-                                paddingHorizontal: ds.space.lg,
-                                paddingVertical: ds.space.sm,
-                                borderRadius: 20,
+                                paddingHorizontal: ds.space.md,
+                                paddingVertical: 7,
+                                borderRadius: 16,
                                 backgroundColor: isActive ? '#E5E7EB' : Colors.white,
                                 borderWidth: isActive ? 0 : 1,
                                 borderColor: '#E5E7EB',
                             }}
                         >
-                            <BodySmallText style={{ color: isActive ? Colors.mainText : '#6B7280' }}>
+                            <BodySmallText style={{ color: isActive ? Colors.mainText : '#6B7280', fontSize: 12 }}>
                                 {tab}
                             </BodySmallText>
                         </TouchableOpacity>
@@ -45,13 +45,13 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({ tabs, activeTab, onTabCh
                 })}
             </ScrollView>
             <TouchableOpacity style={{
-                padding: ds.space.sm,
+                padding: 7,
                 borderRadius: ds.space.md,
                 borderWidth: 1,
                 borderColor: '#E5E7EB',
                 marginLeft: ds.space.sm
             }}>
-                <Feather name="calendar" size={20} color={Colors.mainText} />
+                <Feather name="calendar" size={17} color={Colors.mainText} />
             </TouchableOpacity>
         </View>
     );

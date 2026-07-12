@@ -24,7 +24,7 @@ export default function DataDetails() {
                     {/* Search Bar Placeholder for visual consistency with other screens if needed, 
                         or just the details below */}
                     <View style={styles.searchContainer}>
-                        <Ionicons name="search" size={20} color={Colors.grey200} />
+                        <Ionicons name="search" size={18} color={Colors.grey200} />
                         <BodySmallText style={{ color: Colors.grey200, marginLeft: 8 }}>Search app...</BodySmallText>
                     </View>
 
@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 12,
+        paddingHorizontal: 12,
+        height: 44,
+        borderRadius: 10,
         borderWidth: 1,
         borderColor: '#E2E8F0',
         marginBottom: 40,

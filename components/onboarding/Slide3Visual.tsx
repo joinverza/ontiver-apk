@@ -23,13 +23,19 @@ import Svg, {
   Text as SvgText,
 } from 'react-native-svg';
 
-import { Fonts } from '@/constants/fonts';
-
 const DIAL_SIZE = 300;
 const CX = 150;
 const CY = 150;
 const OUTER_R = 130;
-const RING_THICKNESS = 24;
+const RING_THICKNESS = 26;
+const RING_TICK_INSET = 2.5;
+const DIAL_ASSET_FONT = 'RobotoMono_700Bold';
+const RING_SEGMENTS = {
+  high: { start: 312, end: 50 },
+  medium: { start: 205, end: 312 },
+  low: { start: 138, end: 205 },
+};
+const RING_TICKS = [50, 138, 205, 312];
 const LEVEL_ANGLES = [320, 245, 150];
 
 const AnimatedG = Animated.createAnimatedComponent(G);
@@ -62,10 +68,12 @@ function arc(startDeg: number, endDeg: number, radius: number, thickness: number
 }
 
 function tickPath(angle: number) {
-  const x1 = CX + (OUTER_R - RING_THICKNESS - 2) * Math.cos(toRad(angle));
-  const y1 = CY + (OUTER_R - RING_THICKNESS - 2) * Math.sin(toRad(angle));
-  const x2 = CX + (OUTER_R + 2) * Math.cos(toRad(angle));
-  const y2 = CY + (OUTER_R + 2) * Math.sin(toRad(angle));
+  const innerRadius = OUTER_R - RING_THICKNESS + RING_TICK_INSET;
+  const outerRadius = OUTER_R - RING_TICK_INSET;
+  const x1 = CX + innerRadius * Math.cos(toRad(angle));
+  const y1 = CY + innerRadius * Math.sin(toRad(angle));
+  const x2 = CX + outerRadius * Math.cos(toRad(angle));
+  const y2 = CY + outerRadius * Math.sin(toRad(angle));
 
   return `M ${x1} ${y1} L ${x2} ${y2}`;
 }
@@ -180,17 +188,17 @@ export function Slide3Visual() {
             <Path d="M 150 150 L 283 118 A 137 137 0 0 1 232 255 Z" fill="#020407" opacity="0.48" />
             <Path d="M 150 150 L 282 122 A 137 137 0 0 1 269 184 Z" fill="#FFFFFF" opacity="0.08" />
 
-            <Path d={arc(306, 45, OUTER_R, RING_THICKNESS)} fill="#2F7D24" />
-            <Path d={arc(306, 45, OUTER_R - 4, 5)} fill="#83C766" opacity="0.64" />
+            <Path d={arc(RING_SEGMENTS.high.start, RING_SEGMENTS.high.end, OUTER_R, RING_THICKNESS)} fill="#2F7D24" />
+            <Path d={arc(RING_SEGMENTS.high.start, RING_SEGMENTS.high.end, OUTER_R - 4, 5)} fill="#83C766" opacity="0.64" />
 
-            <Path d={arc(205, 299, OUTER_R, RING_THICKNESS)} fill="#E89A18" />
-            <Path d={arc(205, 299, OUTER_R - 4, 5)} fill="#FFC451" opacity="0.76" />
+            <Path d={arc(RING_SEGMENTS.medium.start, RING_SEGMENTS.medium.end, OUTER_R, RING_THICKNESS)} fill="#E89A18" />
+            <Path d={arc(RING_SEGMENTS.medium.start, RING_SEGMENTS.medium.end, OUTER_R - 4, 5)} fill="#FFC451" opacity="0.76" />
 
-            <Path d={arc(132, 181, OUTER_R, RING_THICKNESS)} fill="#A81414" />
-            <Path d={arc(132, 181, OUTER_R - 4, 5)} fill="#EF4444" opacity="0.7" />
+            <Path d={arc(RING_SEGMENTS.low.start, RING_SEGMENTS.low.end, OUTER_R, RING_THICKNESS)} fill="#A81414" />
+            <Path d={arc(RING_SEGMENTS.low.start, RING_SEGMENTS.low.end, OUTER_R - 4, 5)} fill="#EF4444" opacity="0.7" />
 
-            {[45, 132, 181, 205, 299, 306].map((angle) => (
-              <Path key={angle} d={tickPath(angle)} stroke="#F8FAFC" strokeWidth="4" strokeLinecap="round" />
+            {RING_TICKS.map((angle) => (
+              <Path key={angle} d={tickPath(angle)} stroke="#F8FAFC" strokeWidth="3.4" strokeLinecap="round" />
             ))}
 
             <Circle cx={CX} cy={CY} r={84} fill="#080A0D" opacity="0.84" />
@@ -221,10 +229,10 @@ export function Slide3Visual() {
                 y={CY + 29}
                 textAnchor="middle"
                 fill="#FFFFFF"
-                fontSize="16"
-                fontWeight="800"
-                fontFamily={Fonts.bold}
-                letterSpacing="1.4"
+                fontSize="17"
+                fontWeight="900"
+                fontFamily={DIAL_ASSET_FONT}
+                letterSpacing="0.2"
                 opacity="0.94"
               >
                 TRUST
@@ -237,8 +245,9 @@ export function Slide3Visual() {
               textAnchor="middle"
               fill="#FFFFFF"
               fontSize="16"
-              fontWeight="800"
-              fontFamily={Fonts.extraBold}
+              fontWeight="900"
+              fontFamily={DIAL_ASSET_FONT}
+              letterSpacing="0.4"
             >
               HIGH
             </SvgText>
@@ -250,8 +259,9 @@ export function Slide3Visual() {
                 textAnchor="middle"
                 fill="#FFFFFF"
                 fontSize="15"
-                fontWeight="800"
-                fontFamily={Fonts.extraBold}
+                fontWeight="900"
+                fontFamily={DIAL_ASSET_FONT}
+                letterSpacing="0.2"
               >
                 MEDIUM
               </SvgText>
@@ -264,8 +274,9 @@ export function Slide3Visual() {
                 textAnchor="middle"
                 fill="#FFFFFF"
                 fontSize="16"
-                fontWeight="800"
-                fontFamily={Fonts.extraBold}
+                fontWeight="900"
+                fontFamily={DIAL_ASSET_FONT}
+                letterSpacing="0.4"
               >
                 LOW
               </SvgText>

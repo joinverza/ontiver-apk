@@ -9,10 +9,13 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold
 } from '@expo-google-fonts/inter';
+import {
+  RobotoMono_700Bold
+} from '@expo-google-fonts/roboto-mono/700Bold';
 import { ToastProvider } from '../context/ToastContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '../context/ThemeContext';
+import AppStatusBar from '../components/shared/AppStatusBar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +26,7 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
     Inter_800ExtraBold,
+    RobotoMono_700Bold,
   });
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export default function RootLayout() {
             <Stack.Screen name="auth" />
             <Stack.Screen name="(tabs)" />
           </Stack>
-          <StatusBar style="auto" />
+          <AppStatusBar />
         </ToastProvider>
       </ThemeProvider>
     </SafeAreaProvider>

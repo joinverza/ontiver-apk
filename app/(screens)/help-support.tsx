@@ -61,9 +61,10 @@ export default function HelpSupportScreen() {
                         paddingHorizontal: ds.space.md,
                         borderColor: '#E5E7EB',
                         borderWidth: 1,
-                        marginBottom: ds.space.md
+                        marginBottom: ds.space.md,
+                        height: 44
                     }}>
-                        <Feather name="search" size={20} color="rgba(0, 0, 0, 0.4)" />
+                        <Feather name="search" size={18} color="rgba(0, 0, 0, 0.4)" />
                         <TextInput
                             placeholder='Search FAQ...'
                             placeholderTextColor={"rgba(0, 0, 0, 0.4)"}
@@ -71,16 +72,17 @@ export default function HelpSupportScreen() {
                             onChangeText={setSearchQuery}
                             style={{
                                 flex: 1,
+                                height: '100%',
                                 fontFamily: Fonts.regular,
-                                fontSize: ds.typography.bodySmall.fontSize,
+                                fontSize: Math.max(ds.typography.bodySmall.fontSize - 1, 12),
                                 color: Colors.black,
-                                paddingVertical: ds.space.md,
+                                paddingVertical: 0,
                                 paddingHorizontal: ds.space.sm,
                             }}
                         />
                         {searchQuery.length > 0 && (
                             <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                <Feather name="x" size={20} color="rgba(0, 0, 0, 0.4)" />
+                                <Feather name="x" size={18} color="rgba(0, 0, 0, 0.4)" />
                             </TouchableOpacity>
                         )}
                     </View>

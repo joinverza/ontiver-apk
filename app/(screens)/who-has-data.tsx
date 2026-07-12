@@ -40,9 +40,9 @@ export default function WhoHasYourDataScreen() {
 
                 {/* Search Bar */}
                 <View style={[styles.searchContainer, { marginTop: ds.space.lg }]}>
-                    <Ionicons name="search" size={20} color={Colors.secondaryText} style={styles.searchIcon} />
+                    <Ionicons name="search" size={18} color={Colors.secondaryText} style={styles.searchIcon} />
                     <TextInput
-                        style={[styles.searchInput, { fontFamily: ds.typography.bodyLarge.fontFamily }]}
+                        style={[styles.searchInput, { fontFamily: ds.typography.bodyLarge.fontFamily, fontSize: Math.max(ds.typography.bodySmall.fontSize - 1, 12) }]}
                         placeholder="Search companies..."
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -50,7 +50,7 @@ export default function WhoHasYourDataScreen() {
                     />
                     {searchQuery.length > 0 && (
                         <TouchableOpacity onPress={() => setSearchQuery('')}>
-                            <Ionicons name="close" size={20} color={Colors.black} />
+                            <Ionicons name="close" size={18} color={Colors.black} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -221,9 +221,9 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: '#E5E7EB',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        height: 48,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 44,
     },
     searchIcon: {
         marginRight: 8,

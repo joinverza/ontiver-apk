@@ -23,6 +23,9 @@ interface Props {
   isActive: boolean;
   style?: StyleProp<TextStyle>;
   typingSpeed?: number;
+  enterDelay?: number;
+  exitSpeed?: number;
+  maxExitDuration?: number;
   onExitComplete?: () => void;
   onTypeComplete?: () => void;
 }
@@ -34,7 +37,18 @@ interface Props {
  * - When `isActive` becomes false: characters fade out right-to-left (typewriter out)
  * - `onExitComplete` fires after the exit animation finishes
  */
-export function TypewriterText({ text, segments, isActive, style, typingSpeed = 25, onExitComplete, onTypeComplete }: Props) {
+export function TypewriterText({
+  text,
+  segments,
+  isActive,
+  style,
+  typingSpeed = 14,
+  enterDelay = 80,
+  exitSpeed = 7,
+  maxExitDuration = 220,
+  onExitComplete,
+  onTypeComplete
+}: Props) {
   // progress: 0 = all hidden, totalLength = all visible
   const progress = useSharedValue(0);
 
@@ -69,7 +83,7 @@ export function TypewriterText({ text, segments, isActive, style, typingSpeed = 
       // Type IN: smooth entrance with a gentle ramp
       progress.value = 0;
       progress.value = withDelay(
-        200, // wait for exit to clear
+        enterDelay,
         withTiming(totalLength, {
           duration: totalLength * typingSpeed,
           easing: Easing.out(Easing.quad)
@@ -82,7 +96,7 @@ export function TypewriterText({ text, segments, isActive, style, typingSpeed = 
     } else if (!isActive && totalLength > 0) {
       // Type OUT: quick, smooth reverse fade
       progress.value = withTiming(0, {
-        duration: Math.min(totalLength * 15, 400), // fast exit, capped at 400ms
+        duration: Math.min(totalLength * exitSpeed, maxExitDuration),
         easing: Easing.in(Easing.quad)
       }, (finished) => {
         if (finished && onExitComplete) {
@@ -90,7 +104,7 @@ export function TypewriterText({ text, segments, isActive, style, typingSpeed = 
         }
       });
     }
-  }, [isActive, totalLength, typingSpeed]);
+  }, [enterDelay, exitSpeed, isActive, maxExitDuration, notifyExitComplete, notifyTypeComplete, onExitComplete, onTypeComplete, totalLength, typingSpeed]);
 
   // Group characters into words and lines
   const linesParsed = useMemo(() => {
@@ -173,7 +187,7 @@ const AnimatedChar = React.memo(({ char, index, progress, textStyle }: { char: s
   });
 
   return (
-    <Animated.Text style={[textStyle, animatedStyle]}>
+    <Animated.Text style={[textStyle, { opacity: 0 }, animatedStyle]}>
       {char}
     </Animated.Text>
   );

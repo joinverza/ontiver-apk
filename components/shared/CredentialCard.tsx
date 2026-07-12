@@ -36,12 +36,12 @@ export function credentialCardPath(w: number, h: number, r = 28) {
 // ─── Icon presets keyed by credential type ────────────────────────────────────
 export type CredentialType = 'kyc' | 'aml' | 'kyb' | 'national_id' | 'passport' | 'drivers_license' | 'custom';
 
-function CredentialIcon({ type, color }: { type: CredentialType; color: string }) {
+function CredentialIcon({ type, color, size = 24 }: { type: CredentialType; color: string; size?: number }) {
   switch (type) {
     case 'kyc':
     case 'national_id':
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Rect x="2" y="4" width="20" height="16" rx="2" stroke={color} />
           <Circle cx="8" cy="11" r="3" stroke={color} />
           <Path d="M14 10h4 M14 14h4" stroke={color} />
@@ -50,14 +50,14 @@ function CredentialIcon({ type, color }: { type: CredentialType; color: string }
       );
     case 'aml':
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke={color} />
           <Path d="M9 12l2 2 4-4" stroke={color} />
         </Svg>
       );
     case 'kyb':
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Rect x="4" y="2" width="16" height="20" rx="2" stroke={color} />
           <Path d="M9 22v-4h6v4" stroke={color} />
           <Path d="M8 6h.01 M16 6h.01 M8 10h.01 M16 10h.01 M8 14h.01 M16 14h.01" stroke={color} strokeWidth="2" strokeLinecap="round" />
@@ -65,7 +65,7 @@ function CredentialIcon({ type, color }: { type: CredentialType; color: string }
       );
     case 'passport':
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Rect x="4" y="2" width="16" height="20" rx="2" stroke={color} />
           <Circle cx="12" cy="11" r="4" stroke={color} />
           <Path d="M8 19h8" stroke={color} />
@@ -74,7 +74,7 @@ function CredentialIcon({ type, color }: { type: CredentialType; color: string }
       );
     case 'drivers_license':
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Rect x="2" y="5" width="20" height="14" rx="3" stroke={color} />
           <Circle cx="8" cy="12" r="2.5" stroke={color} />
           <Path d="M14 10h4 M14 14h4" stroke={color} />
@@ -82,7 +82,7 @@ function CredentialIcon({ type, color }: { type: CredentialType; color: string }
       );
     default:
       return (
-        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+        <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
           <Rect x="2" y="4" width="20" height="16" rx="2" stroke={color} />
           <Path d="M8 10h8 M8 14h4" stroke={color} />
         </Svg>
@@ -152,6 +152,10 @@ export interface CredentialCardProps {
   width?: number;
   /** Card height */
   height?: number;
+  /** Adds a clipped logo/image-style watermark behind the existing card content. */
+  showBackgroundLogo?: boolean;
+  /** Override the watermark icon without changing the foreground badge icon. */
+  backgroundLogoType?: CredentialType;
   style?: ViewStyle;
 }
 
@@ -164,6 +168,8 @@ export function CredentialCard({
   status,
   width = 300,
   height = 160,
+  showBackgroundLogo = false,
+  backgroundLogoType,
   style,
 }: CredentialCardProps) {
   const pathD = credentialCardPath(width, height);
@@ -174,6 +180,7 @@ export function CredentialCard({
   const textColor = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
   const subColor  = isLight ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.65)';
   const iconColor = isLight ? 'rgb(255, 255, 255)' : '#ffffff';
+  const watermarkColor = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.1)';
   const badgeBg   = isBlur
     ? undefined
     : isLight ? 'rgb(0, 0, 0)' : 'rgba(153, 153, 153, 0.2)';
@@ -196,6 +203,26 @@ export function CredentialCard({
         <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 ${width} ${height}`}>
           <Path d={pathD} fill={bgColor!} />
         </Svg>
+      )}
+
+      {showBackgroundLogo && (
+        <MaskedView
+          pointerEvents="none"
+          style={StyleSheet.absoluteFill}
+          maskElement={
+            <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 ${width} ${height}`}>
+              <Path d={pathD} fill="black" />
+            </Svg>
+          }
+        >
+          <View style={cardStyles.backgroundLogo}>
+            <CredentialIcon
+              type={backgroundLogoType ?? credentialType}
+              color={watermarkColor}
+              size={Math.min(width * 0.44, height * 0.95)}
+            />
+          </View>
+        </MaskedView>
       )}
 
       {/* Icon badge */}
@@ -252,6 +279,13 @@ const cardStyles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
+  },
+  backgroundLogo: {
+    position: 'absolute',
+    right: 12,
+    bottom: -8,
+    opacity: 1,
+    transform: [{ rotate: '-8deg' }],
   },
   content: {
     position: 'absolute',
