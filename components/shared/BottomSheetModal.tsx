@@ -35,8 +35,8 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
     const panResponder = React.useMemo(
         () =>
             PanResponder.create({
-                onMoveShouldSetPanResponderCapture: (_, gestureState) => gestureState.dy > 12 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
-                onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 8 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
+                onStartShouldSetPanResponder: () => false,
+                onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 16 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx) * 1.4,
                 onPanResponderMove: (_, gestureState) => {
                     dragY.value = Math.max(gestureState.dy, 0);
                 },
@@ -101,6 +101,8 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
             animationType="none"
             onRequestClose={onClose}
             statusBarTranslucent
+            presentationStyle="overFullScreen"
+            hardwareAccelerated
         >
             <View style={styles.modalRoot}>
                 <Animated.View style={[styles.backdrop, backdropStyle]}>

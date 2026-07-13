@@ -7,7 +7,7 @@ import { Fonts } from '@/constants/fonts';
 import { useDesignSystem } from '@/utils/design-system';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SectionList, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -219,6 +219,7 @@ export default function VaultScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<VaultCredentialItem | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const tabs = ['All', 'Verified', 'Pending 05', 'Expired'];
 
@@ -261,9 +262,46 @@ export default function VaultScreen() {
   const verifiedCount = data.filter((item) => item.status === 'Verified').length;
   const pendingCount = data.filter((item) => item.status === 'Pending').length;
 
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleItemPress = (item: VaultCredentialItem) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
     setSelectedItem(item);
-    setModalVisible(true);
+    requestAnimationFrame(() => setModalVisible(true));
+  };
+
+  const closeDetailsDrawer = () => {
+    setModalVisible(false);
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+    closeTimerRef.current = setTimeout(() => {
+      setSelectedItem(null);
+      closeTimerRef.current = null;
+    }, 220);
+  };
+
+  const openFullDetails = (item: VaultCredentialItem) => {
+    setModalVisible(false);
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setTimeout(() => {
+      router.push({
+        pathname: '/(screens)/credential-details',
+        params: { credentialId: item.id },
+      });
+    }, 120);
   };
 
   useEffect(() => {
@@ -396,7 +434,7 @@ export default function VaultScreen() {
 
       <BottomSheetModal
         visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={closeDetailsDrawer}
         heightPercentage={0.68}
         contentStyle={{ backgroundColor: '#F8FAFC' }}
       >
@@ -404,10 +442,7 @@ export default function VaultScreen() {
           <VaultCredentialDetailsDrawer
             item={selectedItem}
             bottomInset={Math.max(insets.bottom + ds.space.md, ds.space.xl)}
-            onViewFullDetails={() => {
-              setModalVisible(false);
-              router.push('/(screens)/credential-details');
-            }}
+            onViewFullDetails={() => openFullDetails(selectedItem)}
           />
         )}
       </BottomSheetModal>

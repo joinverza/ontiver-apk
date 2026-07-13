@@ -4,7 +4,6 @@ import Animated, {
   useAnimatedStyle, 
   useSharedValue, 
   interpolate, 
-  Extrapolation,
   useAnimatedProps,
   withTiming,
   withSpring,
@@ -96,9 +95,6 @@ export default function OnboardingScreen() {
   const progressValue = useSharedValue(0.33);
   const CIRCLE_LENGTH = 2 * Math.PI * 26;
 
-  // Button position animation
-  const buttonProgress = useSharedValue(0);
-
   // Premium button animations
   const glowPulse = useSharedValue(0);
   const orbitRotation = useSharedValue(0);
@@ -108,7 +104,6 @@ export default function OnboardingScreen() {
   // Initialize progress
   React.useEffect(() => {
     progressValue.value = withTiming((currentIndex + 1) / slides.length, { duration: 400 });
-    buttonProgress.value = withTiming(currentIndex, { duration: 500, easing: Easing.out(Easing.cubic) });
   }, [currentIndex]);
 
   const animatedProps = useAnimatedProps(() => ({
@@ -279,25 +274,12 @@ export default function OnboardingScreen() {
     opacity: navOpacity.value
   }));
 
-  // Button position: sweeps from top-left to bottom-right
-  const btnTopBase = 470 + (insets.top > 0 ? insets.top : 20);
+  // Button position: fixed at bottom-right across every onboarding step
   const btnStyle = useAnimatedStyle(() => {
-    const tx = interpolate(
-      buttonProgress.value,
-      [0, 1],
-      [0, SCREEN_WIDTH - 128],
-      Extrapolation.CLAMP
-    );
-    const ty = interpolate(
-      buttonProgress.value,
-      [0, 1],
-      [btnTopBase, SCREEN_HEIGHT - 104 - insets.bottom],
-      Extrapolation.CLAMP
-    );
     return {
       transform: [
-        { translateX: tx },
-        { translateY: ty }
+        { translateX: SCREEN_WIDTH - 128 },
+        { translateY: SCREEN_HEIGHT - 104 - insets.bottom }
       ]
     };
   });
@@ -508,7 +490,7 @@ const styles = StyleSheet.create({
   skipText: {
     fontFamily: 'Inter_700Bold',
     color: '#020805',
-    fontSize: 16,
+    fontSize: 20,
   },
   nextButtonWrapper: {
     position: 'absolute',
