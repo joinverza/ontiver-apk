@@ -2,11 +2,16 @@ import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, type SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { Colors } from '../../constants/Colors';
 import { useDesignSystem } from '../../utils/design-system';
+import {
+  FLOATING_TAB_BAR_HEIGHT,
+  FLOATING_TAB_BAR_RADIUS,
+  getFloatingTabBarBottomOffset,
+} from '../../utils/responsive-spacing';
 
 type TabIconType = 'home' | 'vault' | 'share' | 'privacy' | 'menu';
 
@@ -28,37 +33,64 @@ const TabBarIcon = ({
     });
   }, [focused, progress]);
 
+  if (type === 'share') {
+    return <CenterPlusTab focused={focused} progress={progress} />;
+  }
+
   const iconStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0.68, 1]),
+    opacity: interpolate(progress.value, [0, 1], [0.54, 1]),
     transform: [
-      { translateY: interpolate(progress.value, [0, 1], [2, -2]) },
-      { scale: interpolate(progress.value, [0, 1], [0.94, 1.1]) },
+      { translateY: interpolate(progress.value, [0, 1], [0, -5]) },
+      { scale: interpolate(progress.value, [0, 1], [0.96, 1.08]) },
     ],
   }));
 
-  const indicatorStyle = useAnimatedStyle(() => ({
+  const dotStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
-    width: interpolate(progress.value, [0, 1], [8, 30]),
+    transform: [
+      { translateY: interpolate(progress.value, [0, 1], [2, 0]) },
+      { scale: interpolate(progress.value, [0, 1], [0.2, 1]) },
+    ],
   }));
 
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%', position: 'relative' }}>
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            top: -5,
-            height: 4,
-            backgroundColor: '#0F1A24',
-            borderBottomLeftRadius: 5,
-            borderBottomRightRadius: 5,
-          },
-          indicatorStyle,
-        ]}
-      />
-      <Animated.View style={[{ marginTop: 8 }, iconStyle]}>
+    <View style={styles.tabIconShell}>
+      <Animated.View style={iconStyle}>
         <CustomTabGlyph type={type} width={size} height={size} focused={focused} />
       </Animated.View>
+      <Animated.View style={[styles.activeDot, dotStyle]} />
+    </View>
+  );
+};
+
+const CenterPlusTab = ({
+  focused,
+  progress,
+}: {
+  focused: boolean;
+  progress: SharedValue<number>;
+}) => {
+  const centerStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: interpolate(progress.value, [0, 1], [-24, -30]) },
+      { scale: interpolate(progress.value, [0, 1], [1, 1.08]) },
+    ],
+  }));
+
+  const haloStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 1], [0.22, 0.42]),
+    transform: [{ scale: interpolate(progress.value, [0, 1], [0.9, 1.15]) }],
+  }));
+
+  return (
+    <View style={styles.centerTabShell}>
+      <Animated.View style={[styles.centerHalo, haloStyle]} />
+      <Animated.View style={[styles.centerPlusButton, centerStyle]}>
+        <Svg width={31} height={31} viewBox="0 0 31 31" fill="none">
+          <Path d="M15.5 6.2v18.6M6.2 15.5h18.6" stroke="#FFFFFF" strokeWidth="3.2" strokeLinecap="round" />
+        </Svg>
+      </Animated.View>
+      <View style={[styles.centerStatusDot, { opacity: focused ? 1 : 0 }]} />
     </View>
   );
 };
@@ -74,7 +106,7 @@ const CustomTabGlyph = ({
   height?: number;
   focused?: boolean;
 }) => {
-  const color = focused ? '#0F1A24' : '#6B7280';
+  const color = focused ? Colors.primary : '#AAB3B6';
 
   if (type === 'home') {
     return (
@@ -127,6 +159,7 @@ const CustomTabGlyph = ({
 export default function TabLayout() {
   const ds = useDesignSystem();
   const { bottom: bottomInset } = useSafeAreaInsets()
+  const tabBarBottom = getFloatingTabBarBottomOffset(bottomInset);
 
   return (
     <Tabs
@@ -134,17 +167,33 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.secondaryText,
+        tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: 'transparent',
           position: 'absolute',
+          left: ds.space.lg,
+          right: ds.space.lg,
+          bottom: tabBarBottom,
+          height: FLOATING_TAB_BAR_HEIGHT,
+          backgroundColor: 'rgba(255,255,255,0.94)',
+          borderRadius: FLOATING_TAB_BAR_RADIUS,
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          height: ds.space['7xl'] + bottomInset,
-          paddingBottom: ds.space.sm,
+          paddingTop: 13,
+          paddingBottom: 14,
+          paddingHorizontal: ds.space.sm,
+          overflow: 'visible',
+          boxShadow: '0 18px 38px rgba(5, 21, 14, 0.11)',
+        },
+        tabBarItemStyle: {
+          height: 58,
+          overflow: 'visible',
         },
         tabBarBackground: () => (
-          <BlurView intensity={1900} tint="light" style={StyleSheet.absoluteFill} />
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: FLOATING_TAB_BAR_RADIUS, overflow: 'hidden' }]}>
+            <BlurView intensity={48} tint="light" style={StyleSheet.absoluteFill} />
+            <View style={styles.bottomRail} />
+          </View>
         ),
         tabBarLabelStyle: {
           fontFamily: ds.typography.micro.fontFamily,
@@ -201,3 +250,62 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabIconShell: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
+    gap: 7,
+  },
+  activeDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
+  },
+  centerTabShell: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
+    overflow: 'visible',
+  },
+  centerHalo: {
+    position: 'absolute',
+    top: -31,
+    width: 86,
+    height: 86,
+    borderRadius: 43,
+    backgroundColor: 'rgba(22, 101, 52, 0.15)',
+  },
+  centerPlusButton: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: Colors.primary,
+    borderWidth: 8,
+    borderColor: 'rgba(255,255,255,0.96)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 14px 26px rgba(22, 101, 52, 0.25)',
+  },
+  centerStatusDot: {
+    position: 'absolute',
+    bottom: 1,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
+  },
+  bottomRail: {
+    position: 'absolute',
+    bottom: 13,
+    alignSelf: 'center',
+    width: 128,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(5, 21, 14, 0.12)',
+  },
+});

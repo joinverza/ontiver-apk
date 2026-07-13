@@ -9,6 +9,7 @@ import { BodyLargeText, BodySmallText, H2Text, Label } from '../../components/sh
 import Colors from '../../constants/Colors';
 import { Fonts } from '../../constants/fonts';
 import { useDesignSystem } from '../../utils/design-system';
+import { getFloatingTabBarContentPadding } from '../../utils/responsive-spacing';
 
 const weeklyBars = [
   { value: 62, label: 'Mon' },
@@ -539,13 +540,14 @@ export default function PrivacyDashboard() {
   const ds = useDesignSystem();
   const router = useRouter();
   const { top, bottom } = useSafeAreaInsets();
+  const tabSafePadding = getFloatingTabBarContentPadding(bottom, ds.space['5xl']);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: top }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ paddingHorizontal: ds.space.lg, paddingTop: ds.space.lg, paddingBottom: 140 + bottom, gap: ds.space['2xl'] }}
+        contentContainerStyle={{ paddingHorizontal: ds.space.lg, paddingTop: ds.space.lg, paddingBottom: tabSafePadding, gap: ds.space['2xl'] }}
       >
         <Animated.View entering={FadeInDown.duration(360)} style={{ gap: ds.space.xl }}>
           <PrivacyPass />

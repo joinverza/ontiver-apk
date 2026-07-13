@@ -11,12 +11,15 @@ import { HomeBannerSlider } from '../../components/shared/HomeBannerSlider';
 import { CredentialCard } from '../../components/shared/CredentialCard';
 import { useTheme } from '../../context/ThemeContext';
 import { useDesignSystem } from '../../utils/design-system';
+import { getFloatingActionButtonBottom, getFloatingTabBarContentPadding } from '../../utils/responsive-spacing';
 
 export default function HomeScreen() {
   const ds = useDesignSystem();
   const { isDark } = useTheme();
   const router = useRouter();
   const { top, bottom } = useSafeAreaInsets()
+  const tabSafePadding = getFloatingTabBarContentPadding(bottom, ds.space['5xl']);
+  const floatingActionBottom = getFloatingActionButtonBottom(bottom, ds.space.lg);
 
   const recentActivities = [
     {
@@ -122,6 +125,7 @@ export default function HomeScreen() {
 
         <FlatList
           data={recentActivities}
+          contentInsetAdjustmentBehavior="automatic"
           renderItem={({ item, index }) => {
             const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
             return (
@@ -254,12 +258,12 @@ export default function HomeScreen() {
               </View>
             </View>
           )}
-          contentContainerStyle={{ paddingVertical: ds.space.sm, paddingBottom: 140 + bottom }}
+          contentContainerStyle={{ paddingVertical: ds.space.sm, paddingBottom: tabSafePadding }}
         />
 
         <Animated.View
           entering={FadeInUp.delay(500).springify()}
-          style={{ position: "absolute", bottom: ds.space['8xl'] * 2 + bottom, right: ds.space.xl, zIndex: 100 }}
+          style={{ position: "absolute", bottom: floatingActionBottom, right: ds.space.xl, zIndex: 100 }}
         >
           <TouchableOpacity
             style={{ backgroundColor: ds.colors.primary, width: 64, height: 64, borderRadius: 32, justifyContent: "center", alignItems: "center", shadowColor: ds.colors.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}

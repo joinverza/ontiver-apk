@@ -3,20 +3,20 @@ import { BodyLargeText, BodySmallText, H2Text } from '@/components/shared/AppTex
 import { Fonts } from '@/constants/fonts';
 import { ASSETS } from '@/utils/assets';
 import { router } from 'expo-router';
-import { Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { useTheme } from '../../context/ThemeContext';
 import { useDesignSystem } from '../../utils/design-system';
-
-const width = Dimensions.get("window").width
+import { getFloatingTabBarContentPadding } from '../../utils/responsive-spacing';
 
 export default function SettingsScreen() {
   const ds = useDesignSystem();
   const insets = useSafeAreaInsets();
   const { bottom } = insets;
   const { isDark, setTheme } = useTheme();
+  const tabSafePadding = getFloatingTabBarContentPadding(bottom, ds.space['5xl']);
 
   const data = [
     {
@@ -74,7 +74,7 @@ export default function SettingsScreen() {
             backgroundColor: Colors.white,
             zIndex: 100,
             borderRadius: ds.radius.xl,
-            width: width - (2 * ds.space.xl),
+            width: ds.width - (2 * ds.space.xl),
             shadowColor: Colors.black,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.1,
@@ -118,6 +118,7 @@ export default function SettingsScreen() {
 
         <FlatList
           data={data}
+          contentInsetAdjustmentBehavior="automatic"
           renderItem={({ item, index }) => {
             const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
             return (
@@ -148,7 +149,7 @@ export default function SettingsScreen() {
           )}
           contentContainerStyle={{
             paddingTop: ds.space['7xl'],
-            paddingBottom: 140 + bottom,
+            paddingBottom: tabSafePadding,
           }}
           ListFooterComponent={<View style={{ marginVertical: ds.space.xl, marginHorizontal: ds.space.md }}>
             <AppButton

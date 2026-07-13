@@ -19,6 +19,7 @@ import {
 import { Colors } from '../../constants/Colors';
 import { Fonts } from '../../constants/fonts';
 import { useDesignSystem } from '../../utils/design-system';
+import { getFloatingTabBarContentPadding } from '../../utils/responsive-spacing';
 
 type ShareStatus = 'Active' | 'Revoked' | 'Denied';
 type SharedFieldType = 'name' | 'email' | 'age' | 'phone' | 'birth' | 'address' | 'kyc' | 'id';
@@ -295,6 +296,7 @@ function ShareStickyControls({
 export default function ShareScreen() {
   const ds = useDesignSystem();
   const { top, bottom } = useSafeAreaInsets();
+  const tabSafePadding = getFloatingTabBarContentPadding(bottom, ds.space['5xl']);
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
@@ -432,6 +434,7 @@ export default function ShareScreen() {
         sections={sections}
         keyExtractor={(item) => item.id}
         stickySectionHeadersEnabled
+        contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
           <Animated.View entering={FadeInUp.duration(260)} style={{ gap: ds.space.lg, paddingBottom: ds.space.lg }}>
@@ -507,7 +510,7 @@ export default function ShareScreen() {
             <BodySmallText style={{ marginTop: 4, color: 'rgba(5, 21, 14, 0.55)' }}>Try another status or search term.</BodySmallText>
           </View>
         )}
-        contentContainerStyle={{ paddingBottom: 140 + bottom }}
+        contentContainerStyle={{ paddingBottom: tabSafePadding }}
       />
 
       <BottomSheetModal

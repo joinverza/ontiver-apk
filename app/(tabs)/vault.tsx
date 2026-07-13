@@ -5,6 +5,7 @@ import { FilterTabs } from '@/components/shared/FilterTabs';
 import { VaultCredentialDetailsDrawer, type VaultCredentialItem } from '@/components/shared/VaultCredentialDetailsDrawer';
 import { Fonts } from '@/constants/fonts';
 import { useDesignSystem } from '@/utils/design-system';
+import { getFloatingActionButtonBottom, getFloatingTabBarContentPadding } from '@/utils/responsive-spacing';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -215,6 +216,8 @@ export default function VaultScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { credentialId, openCredentialAt } = useLocalSearchParams<{ credentialId?: string; openCredentialAt?: string }>();
+  const tabSafePadding = getFloatingTabBarContentPadding(insets.bottom, ds.space['5xl']);
+  const floatingActionBottom = getFloatingActionButtonBottom(insets.bottom, ds.space.lg);
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<VaultCredentialItem | null>(null);
@@ -335,6 +338,7 @@ export default function VaultScreen() {
         sections={sections}
         keyExtractor={(item) => item.id}
         stickySectionHeadersEnabled
+        contentInsetAdjustmentBehavior="automatic"
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeInUp.delay(index * 80).duration(320)}>
             <TouchableOpacity
@@ -415,14 +419,14 @@ export default function VaultScreen() {
         ItemSeparatorComponent={() => <View style={{ height: ds.space.lg }} />}
         contentContainerStyle={{
           paddingHorizontal: ds.space.lg,
-          paddingBottom: 140 + insets.bottom,
+          paddingBottom: tabSafePadding,
         }}
         showsVerticalScrollIndicator={false}
       />
 
       <Animated.View
         entering={FadeInUp.delay(500).springify()}
-        style={{ position: 'absolute', bottom: ds.space['7xl'] + insets.bottom + ds.space.lg, right: ds.space.xl, zIndex: 100 }}
+        style={{ position: 'absolute', bottom: floatingActionBottom, right: ds.space.xl, zIndex: 100 }}
       >
         <TouchableOpacity
           style={{ backgroundColor: Colors.primary, width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', shadowColor: Colors.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}

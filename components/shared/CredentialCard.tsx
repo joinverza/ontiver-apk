@@ -259,7 +259,7 @@ function isLightColor(hex: string) {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const cardStyles = StyleSheet.create({
   shadow: {
-    shadowColor: '#000',
+    shadowColor: '#00000000',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.28,
     shadowRadius: 20,
