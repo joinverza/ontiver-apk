@@ -17,38 +17,18 @@ interface SharingHistoryCardProps {
 }
 
 export function getShareStatusStyles(status: string) {
-    if (status === 'Active') {
-        return { bg: '#ECFDF3', text: '#047A35', border: '#BBF7D0', dot: '#16A34A' };
-    }
     if (status === 'Revoked') {
-        return { bg: '#F4F5F7', text: '#4B5563', border: '#E5E7EB', dot: '#6B7280' };
+        return { bg: '#F8FAFC', text: 'rgba(5, 21, 14, 0.52)', border: '#E5E7EB', dot: 'rgba(5, 21, 14, 0.3)' };
     }
     if (status === 'Denied') {
-        return { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#E11D48' };
+        return { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA', dot: '#B91C1C' };
     }
-    return { bg: Colors.white, text: Colors.mainText, border: Colors.grey200, dot: Colors.mainText };
+
+    return { bg: '#ECFDF3', text: Colors.primary, border: 'rgba(22, 101, 52, 0.18)', dot: Colors.primary };
 }
 
 export function getSharePartnerMeta(name: string) {
-    const key = name.toLowerCase();
-
-    if (key.includes('flutterwave')) {
-        return { bg: '#EFF8FF', border: '#BAE6FD', accent: '#0284C7' };
-    }
-    if (key.includes('kuda')) {
-        return { bg: '#F4F0FF', border: '#DDD6FE', accent: '#5B21B6' };
-    }
-    if (key.includes('binance')) {
-        return { bg: '#FFF8DB', border: '#FDE68A', accent: '#B7791F' };
-    }
-    if (key.includes('opay')) {
-        return { bg: '#ECFEFF', border: '#A5F3FC', accent: '#0891B2' };
-    }
-    if (key.includes('paystack')) {
-        return { bg: '#EEFDF3', border: '#BBF7D0', accent: '#166534' };
-    }
-
-    return { bg: '#F8FAFC', border: '#E2E8F0', accent: '#334155' };
+    return { bg: '#F8FAFC', border: '#E5E7EB', accent: Colors.primary };
 }
 
 export function SharePartnerIcon({ name, size = 26 }: { name: string; size?: number }) {
@@ -116,9 +96,9 @@ export const SharingHistoryCard: React.FC<SharingHistoryCardProps> = ({ name, de
     const statusStyles = getShareStatusStyles(status);
     const partnerMeta = getSharePartnerMeta(name);
     const detailRows = [
-        { eyebrow: 'Shared data', value: details, icon: 'layers' as const },
-        { eyebrow: 'Purpose', value: purpose ?? 'Identity verification', icon: 'shield' as const },
-        { eyebrow: 'Last activity', value: time, icon: 'clock' as const },
+        { label: 'Shared Data', value: details },
+        { label: 'Purpose', value: purpose ?? 'Identity verification' },
+        { label: 'Last Activity', value: time },
     ];
 
     return (
@@ -133,23 +113,23 @@ export const SharingHistoryCard: React.FC<SharingHistoryCardProps> = ({ name, de
                 borderWidth: 1,
             }}
         >
-            <View style={{ padding: ds.space.lg, gap: ds.space.lg }}>
+            <View style={{ paddingHorizontal: ds.space.lg, paddingTop: ds.space.lg }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: ds.space.md }}>
                     <View style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: ds.radius.lg,
-                        backgroundColor: partnerMeta.bg,
-                        borderColor: partnerMeta.border,
+                        width: 42,
+                        height: 42,
+                        borderRadius: ds.radius.full,
+                        backgroundColor: '#F8FAFC',
+                        borderColor: '#E5E7EB',
                         borderWidth: 1,
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                        <SharePartnerIcon name={name} size={28} />
+                        <SharePartnerIcon name={name} size={24} />
                     </View>
 
                     <View style={{ flex: 1, gap: 3 }}>
-                        <BodyLargeText numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: 17, color: '#05150E' }}>{name}</BodyLargeText>
+                        <BodyLargeText numberOfLines={1} style={{ fontFamily: Fonts.semiBold, fontSize: 15, color: '#05150E' }}>{name}</BodyLargeText>
                         <BodySmallText numberOfLines={1} style={{ color: 'rgba(5, 21, 14, 0.52)', fontFamily: Fonts.medium, fontSize: 12 }}>
                             Data sharing request
                         </BodySmallText>
@@ -166,54 +146,29 @@ export const SharingHistoryCard: React.FC<SharingHistoryCardProps> = ({ name, de
                         borderColor: statusStyles.border,
                         borderWidth: 1,
                     }}>
-                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusStyles.dot }} />
+                        {/* <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusStyles.dot }} /> */}
                         <BodySmallText style={{ color: statusStyles.text, fontSize: 10, fontFamily: Fonts.bold }}>{status}</BodySmallText>
                     </View>
                 </View>
 
-                <View style={{ borderRadius: ds.radius.md, overflow: 'hidden', borderWidth: 1, borderColor: '#EEF2F6' }}>
+                <View style={{ marginTop: ds.space.md }}>
                     {detailRows.map((row, index) => (
                         <View
-                            key={row.eyebrow}
+                            key={row.label}
                             style={{
-                                minHeight: 62,
+                                minHeight: 58,
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                gap: ds.space.md,
-                                paddingHorizontal: ds.space.md,
-                                backgroundColor: index % 2 === 0 ? '#F8FAFC' : Colors.white,
+                                gap: ds.space.lg,
                                 borderBottomWidth: index === detailRows.length - 1 ? 0 : 1,
-                                borderBottomColor: '#EEF2F6',
+                                borderBottomColor: 'rgba(5, 21, 14, 0.07)',
                             }}
                         >
-                            <View style={{
-                                width: 34,
-                                height: 34,
-                                borderRadius: ds.radius.full,
-                                backgroundColor: partnerMeta.bg,
-                                borderWidth: 1,
-                                borderColor: partnerMeta.border,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <Feather name={row.icon} size={16} color={partnerMeta.accent} />
-                            </View>
                             <View style={{ flex: 1 }}>
-                                <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.42)', fontFamily: Fonts.medium, fontSize: 11 }}>{row.eyebrow}</BodySmallText>
-                                <BodyLargeText numberOfLines={1} style={{ color: '#05150E', fontFamily: Fonts.semiBold, fontSize: 14, marginTop: 1 }}>{row.value}</BodyLargeText>
+                                <BodyLargeText numberOfLines={1} style={{ color: '#05150E', fontFamily: Fonts.semiBold, fontSize: 14 }}>{row.label}</BodyLargeText>
+                                <BodySmallText numberOfLines={1} style={{ color: 'rgba(5, 21, 14, 0.42)', fontFamily: Fonts.medium, fontSize: 12, marginTop: 3 }}>{row.value}</BodySmallText>
                             </View>
-                            <View style={{
-                                width: 30,
-                                height: 30,
-                                borderRadius: ds.radius.full,
-                                backgroundColor: Colors.white,
-                                borderWidth: 1,
-                                borderColor: '#E5E7EB',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <Feather name="arrow-right" size={15} color="rgba(5, 21, 14, 0.7)" />
-                            </View>
+                            <Feather name="arrow-right" size={18} color="rgba(5, 21, 14, 0.3)" />
                         </View>
                     ))}
                 </View>

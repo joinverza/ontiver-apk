@@ -123,39 +123,30 @@ export default function HomeScreen() {
         <FlatList
           data={recentActivities}
           renderItem={({ item, index }) => {
-            const renderColors = () => {
-              if (item.status === "Verified") return { bg: isDark ? "rgba(34, 197, 94, 0.14)" : "rgba(232, 255, 238, 1)", text: isDark ? "#86efac" : "rgba(0, 125, 33, 1)", border: isDark ? "rgba(74, 222, 128, 0.25)" : "rgba(0, 125, 33, 0.14)", dot: "#22c55e" }
-              if (item.status === "Pending") return { bg: isDark ? "rgba(251, 146, 60, 0.14)" : "rgba(255, 246, 235, 1)", text: isDark ? "#fdba74" : "rgba(170, 81, 2, 1)", border: isDark ? "rgba(251, 146, 60, 0.25)" : "rgba(170, 81, 2, 0.14)", dot: "#fb923c" }
-              if (item.status === "Declined") return { bg: isDark ? "rgba(239, 68, 68, 0.14)" : "rgba(255, 241, 242, 1)", text: isDark ? "#fca5a5" : "rgba(125, 0, 2, 1)", border: isDark ? "rgba(239, 68, 68, 0.25)" : "rgba(125, 0, 2, 0.14)", dot: "#ef4444" }
-            }
-
-            const colors = renderColors()
-            const activityIcon = item.status === "Verified" ? "check-circle" : item.status === "Pending" ? "clock" : "x-circle"
-
             const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
             return (
               <AnimatedTouchableOpacity
                 entering={FadeInUp.delay(index * 100).duration(400)}
-                style={{ minHeight: 74, flexDirection: "row", alignItems: "center", gap: ds.space.md, padding: ds.space.md, backgroundColor: ds.colors.white, borderRadius: ds.radius.lg, borderColor: colors?.border, borderWidth: 1 }}>
-                <View style={{ backgroundColor: colors?.bg, width: 44, height: 44, borderRadius: ds.radius.full, justifyContent: "center", alignItems: "center", borderWidth: 1, borderColor: colors?.border }}>
-                  <Feather name={activityIcon} size={20} color={colors?.text} />
-                </View>
-                <View style={{ flex: 1, gap: 3 }}>
+                onPress={() => router.push('/(screens)/activities')}
+                style={{
+                  minHeight: 70,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: ds.space.lg,
+                  paddingVertical: ds.space.md,
+                  borderBottomWidth: 1,
+                  borderBottomColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(5,21,14,0.07)",
+                }}>
+                <View style={{ flex: 1, gap: 5 }}>
                   <BodyLargeText style={{ fontFamily: Fonts.semiBold, color: ds.colors.mainText, fontSize: 15 }}>{item.title}</BodyLargeText>
-                  <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 12 }}>{item.date}</BodySmallText>
+                  <BodySmallText style={{ color: ds.colors.secondaryText, fontFamily: Fonts.medium, fontSize: 12 }}>{item.status} | {item.date}</BodySmallText>
                 </View>
-                <View style={{ alignItems: "flex-end", gap: 6 }}>
-                  <View style={{ flexDirection: "row", backgroundColor: colors?.bg, borderColor: colors?.border, borderWidth: 1, paddingHorizontal: ds.space.sm, paddingVertical: 5, justifyContent: "center", alignItems: "center", borderRadius: ds.radius.full, gap: 6 }}>
-                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors?.dot }} />
-                    <BodySmallText style={{ color: colors?.text, fontFamily: Fonts.bold, fontSize: 11 }}>{item.status}</BodySmallText>
-                  </View>
-                  <Feather name="arrow-right" size={16} color={ds.colors.secondaryText} />
-                </View>
+                <Feather name="arrow-right" size={19} color={ds.colors.secondaryText} />
               </AnimatedTouchableOpacity>
             )
           }}
           showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: ds.space.md }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
           ListHeaderComponent={() => (
             <View style={{ marginBottom: ds.space.xl, gap: ds.space.lg }}>
               {/* Home Slider */}

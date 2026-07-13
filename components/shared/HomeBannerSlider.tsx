@@ -8,7 +8,7 @@ interface HomeBannerSliderProps {
 }
 
 const AUTO_SCROLL_INTERVAL_MS = 2000;
-const MANUAL_RESUME_DELAY_MS = 2000;
+const MANUAL_RESUME_DELAY_MS = 1500;
 
 export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
   const ds = useDesignSystem();
@@ -19,8 +19,8 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
   const autoScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const itemWidth = ds.width * 0.9;
-  const snapInterval = itemWidth + ds.space.lg;
+  const itemWidth = ds.width - ds.space.lg * 2;
+  const snapInterval = itemWidth;
 
   const clearAutoScroll = useCallback(() => {
     if (autoScrollTimeoutRef.current) {
@@ -101,46 +101,52 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({ data }) => {
 
   return (
     <View style={{ gap: ds.space.lg }}>
-      <FlatList
-        ref={flatListRef}
-        data={data}
-        renderItem={({ item }) => {
-          const SvgImage = item.image;
-          return (
-            <TouchableOpacity onPress={item.onPress} style={{ width: itemWidth, borderRadius: ds.space.md, overflow: 'hidden' }}>
-              <SvgImage width="100%" height={ds.width * 0.4} />
-            </TouchableOpacity>
-          );
-        }}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ width: ds.space.lg }} />}
-        snapToInterval={snapInterval}
-        decelerationRate="fast"
-        onScroll={(e) => {
-          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
-        }}
-        onScrollBeginDrag={pauseAutoScrollForManualInteraction}
-        onMomentumScrollBegin={pauseAutoScrollForManualInteraction}
-        onScrollEndDrag={(e) => {
-          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
-          resumeAutoScrollAfterManualInteraction();
-        }}
-        onMomentumScrollEnd={(e) => {
-          updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
-          resumeAutoScrollAfterManualInteraction();
-        }}
-        scrollEventThrottle={16}
-      />
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: ds.space.xs }}>
+      <View style={{ borderRadius: ds.radius.lg, overflow: 'hidden' }}>
+        <FlatList
+          ref={flatListRef}
+          data={data}
+          renderItem={({ item }) => {
+            const SvgImage = item.image;
+            return (
+              <TouchableOpacity onPress={item.onPress} activeOpacity={0.9} style={{ width: itemWidth, overflow: 'hidden' }}>
+                <SvgImage width="100%" height={ds.width * 0.4} />
+              </TouchableOpacity>
+            );
+          }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={snapInterval}
+          decelerationRate="fast"
+          onScroll={(e) => {
+            updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+          }}
+          onScrollBeginDrag={pauseAutoScrollForManualInteraction}
+          onMomentumScrollBegin={pauseAutoScrollForManualInteraction}
+          onScrollEndDrag={(e) => {
+            updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+            resumeAutoScrollAfterManualInteraction();
+          }}
+          onMomentumScrollEnd={(e) => {
+            updateActiveIndexFromOffset(e.nativeEvent.contentOffset.x);
+            resumeAutoScrollAfterManualInteraction();
+          }}
+          getItemLayout={(_, index) => ({
+            length: itemWidth,
+            offset: itemWidth * index,
+            index,
+          })}
+          scrollEventThrottle={16}
+        />
+      </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5 }}>
         {data.map((_, index) => (
           <View
             key={index}
             style={{
-              width: index === activeSlider ? 20 : 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: index === activeSlider ? Colors.mainText : 'rgba(225, 225, 225, 1)',
+              width: index === activeSlider ? 18 : 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: index === activeSlider ? Colors.mainText : 'rgba(5, 21, 14, 0.16)',
             }}
           />
         ))}

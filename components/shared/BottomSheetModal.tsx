@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Modal, Pressable, TouchableOpacity, StyleSheet, Dimensions, ViewStyle } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { Colors } from '../../constants/Colors';
+import { View, Modal, Pressable, StyleSheet, Dimensions, ViewStyle, PanResponder } from 'react-native';
 import Animated, {
     Easing,
     interpolate,
@@ -32,10 +30,41 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 }) => {
     const [shouldRender, setShouldRender] = React.useState(visible);
     const progress = useSharedValue(0);
+    const dragY = useSharedValue(0);
+
+    const panResponder = React.useMemo(
+        () =>
+            PanResponder.create({
+                onMoveShouldSetPanResponderCapture: (_, gestureState) => gestureState.dy > 12 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
+                onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 8 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
+                onPanResponderMove: (_, gestureState) => {
+                    dragY.value = Math.max(gestureState.dy, 0);
+                },
+                onPanResponderRelease: (_, gestureState) => {
+                    if (gestureState.dy > 90 || gestureState.vy > 1.1) {
+                        onClose();
+                        return;
+                    }
+
+                    dragY.value = withTiming(0, {
+                        duration: 180,
+                        easing: Easing.out(Easing.cubic),
+                    });
+                },
+                onPanResponderTerminate: () => {
+                    dragY.value = withTiming(0, {
+                        duration: 180,
+                        easing: Easing.out(Easing.cubic),
+                    });
+                },
+            }),
+        [dragY, onClose],
+    );
 
     React.useEffect(() => {
         if (visible) {
             setShouldRender(true);
+            dragY.value = 0;
             progress.value = 0;
             progress.value = withTiming(1, {
                 duration: 280,
@@ -59,7 +88,7 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 
     const sheetStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateY: interpolate(progress.value, [0, 1], [screenHeight * 0.42, 0]) },
+            { translateY: interpolate(progress.value, [0, 1], [screenHeight * 0.42, 0]) + dragY.value },
         ],
     }));
 
@@ -90,12 +119,11 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
                         contentStyle,
                         sheetStyle,
                     ]}
+                    {...panResponder.panHandlers}
                 >
-                    <View style={styles.dragHandle} />
-                    
-                    <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                        <Feather name="x" size={24} color={Colors.black} />
-                    </TouchableOpacity>
+                    <View style={styles.dragHandleHitArea}>
+                        <View style={styles.dragHandle} />
+                    </View>
 
                     {children}
                 </Animated.View>
@@ -126,13 +154,13 @@ const styles = StyleSheet.create({
         height: 4,
         backgroundColor: '#D1D5DB',
         borderRadius: 2,
-        alignSelf: 'center',
-        marginBottom: 14,
     },
-    closeButton: {
-        position: 'absolute',
-        top: 24,
-        right: 24,
-        zIndex: 10,
+    dragHandleHitArea: {
+        height: 24,
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingTop: 2,
+        marginBottom: 6,
     }
 });
