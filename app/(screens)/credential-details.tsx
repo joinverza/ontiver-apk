@@ -6,7 +6,7 @@ import { useDesignSystem } from '@/utils/design-system';
 import { Feather } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -128,49 +128,15 @@ function CredentialHeroGraphic() {
       <Rect x="48" y="11" width="53" height="72" rx="16" fill="url(#heroGlass)" stroke="rgba(255,255,255,0.42)" strokeWidth="2" />
       <Path d="M62 31h25M62 45h18M62 59h23" stroke="rgba(255,255,255,0.5)" strokeWidth="5" strokeLinecap="round" />
       <Path d="M46 22h-8v13M104 75h10V62" stroke="rgba(255,255,255,0.76)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-
+{/* 
       <Circle cx="87" cy="84" r="32" fill="url(#heroCheck)" stroke="rgba(255,255,255,0.72)" strokeWidth="6" />
-      <Circle cx="87" cy="84" r="22" fill="rgba(255,255,255,0.09)" />
-      <Path d="M73 84.5 82.8 94 101.8 73.5" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx="87" cy="84" r="22" fill="rgba(255,255,255,0.09)" /> */}
+      {/* <Path d="M73 84.5 82.8 94 101.8 73.5" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" /> */}
     </Svg>
   );
 }
 
-function StatusPill({ status }: { status: CredentialDetail['status'] }) {
-  const isVerified = status === 'Verified';
 
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        borderRadius: 999,
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        backgroundColor: isVerified ? '#ECFDF3' : '#FFF7ED',
-      }}
-    >
-      <View
-        style={{
-          width: 7,
-          height: 7,
-          borderRadius: 4,
-          backgroundColor: isVerified ? '#22C55E' : '#F97316',
-        }}
-      />
-      <BodySmallText
-        style={{
-          color: isVerified ? '#166534' : '#C2410C',
-          fontFamily: Fonts.bold,
-          fontSize: 11,
-        }}
-      >
-        {status}
-      </BodySmallText>
-    </View>
-  );
-}
 
 function DetailRow({ item, isLast, index }: { item: DetailItem; isLast: boolean; index: number }) {
   const ds = useDesignSystem();
@@ -369,7 +335,7 @@ export default function CredentialDetailsScreen() {
               <Svg width="100%" height="100%" viewBox="0 0 360 164" preserveAspectRatio="none">
                 <Circle cx="48" cy="36" r="54" fill="rgba(255,255,255,0.08)" />
                 <Circle cx="336" cy="12" r="86" fill="rgba(255,255,255,0.08)" />
-                <Path d="M-8 142C74 78 136 190 218 106C278 44 316 70 374 28" stroke="rgba(255,255,255,0.14)" strokeWidth="24" strokeLinecap="round" />
+                {/* <Path d="M-8 142C74 78 136 190 218 106C278 44 316 70 374 28" stroke="rgba(255,255,255,0.14)" strokeWidth="24" strokeLinecap="round" /> */}
               </Svg>
             </View>
 
