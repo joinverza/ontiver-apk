@@ -278,7 +278,7 @@ export default function VaultScreen() {
       closeTimerRef.current = null;
     }
     setSelectedItem(item);
-    requestAnimationFrame(() => setModalVisible(true));
+    setModalVisible(true);
   };
 
   const closeDetailsDrawer = () => {

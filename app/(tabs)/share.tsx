@@ -520,7 +520,7 @@ export default function ShareScreen() {
       >
         {selectedItem && selectedStatus && selectedPartner && (
           <View style={{ flex: 1 }}>
-            <Animated.View entering={FadeInUp.duration(240)} style={{
+            <View style={{
               flexDirection: 'row',
               alignItems: 'center',
               gap: ds.space.md,
@@ -561,13 +561,13 @@ export default function ShareScreen() {
                 <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: selectedStatus.dot }} />
                 <BodySmallText style={{ color: selectedStatus.text, fontSize: 10, fontFamily: Fonts.bold }}>{selectedItem.status}</BodySmallText>
               </View>
-            </Animated.View>
+            </View>
 
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: ds.space.xl, gap: ds.space.lg }}
             >
-              <Animated.View entering={FadeInUp.delay(40).duration(260)} style={{
+              <View style={{
                 backgroundColor: '#05150E',
                 borderRadius: ds.radius.lg,
                 overflow: 'hidden',
@@ -593,9 +593,9 @@ export default function ShareScreen() {
                 >
                   <BodySmallText style={{ color: Colors.white, fontFamily: Fonts.semiBold, fontSize: 11 }}>Verified identity share</BodySmallText>
                 </View>
-              </Animated.View>
+              </View>
 
-              <Animated.View entering={FadeInUp.delay(80).duration(260)} style={{ gap: ds.space.sm }}>
+              <View style={{ gap: ds.space.sm }}>
                 <Label style={{ color: 'rgba(5, 21, 14, 0.58)' }}>Shared data</Label>
                 <View style={{
                   backgroundColor: Colors.white,
@@ -635,7 +635,7 @@ export default function ShareScreen() {
                     </View>
                   ))}
                 </View>
-              </Animated.View>
+              </View>
             </ScrollView>
 
             <View style={{ paddingTop: ds.space.sm, paddingBottom: Math.max(bottom + ds.space.md, ds.space.xl) }}>

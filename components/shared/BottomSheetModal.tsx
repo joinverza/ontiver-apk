@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Modal, Pressable, StyleSheet, Dimensions, ViewStyle, PanResponder } from 'react-native';
+import { View, Modal, Pressable, StyleSheet, ViewStyle, PanResponder, useWindowDimensions } from 'react-native';
 import Animated, {
     Easing,
     interpolate,
@@ -8,8 +8,6 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
-
-const { height: screenHeight } = Dimensions.get('window');
 
 interface BottomSheetModalProps {
     visible: boolean;
@@ -28,6 +26,7 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
     bottomOffset = 0,
     contentStyle,
 }) => {
+    const { height: screenHeight } = useWindowDimensions();
     const [shouldRender, setShouldRender] = React.useState(visible);
     const progress = useSharedValue(0);
     const dragY = useSharedValue(0);
@@ -92,11 +91,13 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
         ],
     }));
 
-    if (!shouldRender) return null;
+    const isRendered = visible || shouldRender;
+
+    if (!isRendered) return null;
 
     return (
         <Modal
-            visible={shouldRender}
+            visible={isRendered}
             transparent
             animationType="none"
             onRequestClose={onClose}

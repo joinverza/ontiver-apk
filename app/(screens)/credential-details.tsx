@@ -236,9 +236,8 @@ export default function CredentialDetailsScreen() {
   const handleCopyCredentialLink = async () => {
     try {
       await Clipboard.setStringAsync(credentialLink);
-      toast.showToast({ message: 'Credential link copied', type: 'success' });
     } catch {
-      toast.showToast({ message: 'Unable to copy credential link', type: 'error' });
+      // Keep copy silent so the details page does not show a toast notification.
     }
   };
 

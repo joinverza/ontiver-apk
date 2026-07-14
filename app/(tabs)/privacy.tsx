@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
@@ -79,18 +79,21 @@ const scoreFactors = [
     detail: '3 companies have current access',
     value: '-12 pts',
     color: '#BE123C',
+    route: '/(screens)/who-has-data' as const,
   },
   {
     title: 'Credential Completeness',
     detail: 'Core credentials are verified',
     value: '+8 pts',
     color: '#166534',
+    route: '/vault' as const,
   },
   {
     title: 'Breach History',
     detail: 'No active breach alert',
     value: '+10 pts',
     color: '#0E7490',
+    route: '/(screens)/privacy/breach-alert' as const,
   },
 ];
 
@@ -495,6 +498,16 @@ function ListRow({
   onPress?: () => void;
 }) {
   const ds = useDesignSystem();
+  const rowStyle = {
+    minHeight: 66,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: ds.space.lg,
+    paddingVertical: ds.space.sm,
+    paddingHorizontal: ds.space.sm,
+    marginHorizontal: -ds.space.sm,
+    borderRadius: ds.radius.md,
+  };
   const content = (
     <>
       <View style={{ flex: 1, gap: 3 }}>
@@ -510,13 +523,24 @@ function ListRow({
 
   if (onPress) {
     return (
-      <TouchableOpacity activeOpacity={0.82} onPress={onPress} style={{ minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: ds.space.lg }}>
+      <Pressable
+        onPress={onPress}
+        hitSlop={8}
+        android_ripple={{ color: 'rgba(22,101,52,0.08)', borderless: false }}
+        style={({ pressed }) => [
+          rowStyle,
+          {
+            backgroundColor: pressed ? 'rgba(22,101,52,0.06)' : 'transparent',
+            opacity: pressed ? 0.82 : 1,
+          },
+        ]}
+      >
         {content}
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
-  return <View style={{ minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: ds.space.lg }}>{content}</View>;
+  return <View style={rowStyle}>{content}</View>;
 }
 
 function PlainListSection({
@@ -585,6 +609,7 @@ export default function PrivacyDashboard() {
                 detail={factor.detail}
                 value={factor.value}
                 color={factor.color}
+                onPress={() => router.push(factor.route)}
               />
             ))}
           </PlainListSection>
