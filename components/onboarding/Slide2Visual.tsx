@@ -58,7 +58,7 @@ interface Slide2VisualProps {
 
 function BvnBadgeIcon() {
   return (
-    <Svg viewBox="0 0 32 32" fill="none" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+    <Svg viewBox="0 0 32 32" fill="none" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
       <Path d="M5 12.4L16 6.2l11 6.2V15H5v-2.6Z" fill="#E7FFEA" stroke="#194A12" strokeWidth="2" />
       <Path d="M8 15v8M13.3 15v8M18.7 15v8M24 15v8" stroke="#194A12" strokeWidth="2" />
       <Path d="M5.5 24h21M7.5 27h17" stroke="#194A12" strokeWidth="2" />
@@ -197,7 +197,7 @@ export function Slide2Visual({ activationKey = 0, isVisualReady = false }: Slide
             <Path d={pathD} fill="#3801E5" />
           </Svg>
           <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
-              <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+              <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="21" height="21">
                 <Rect x="4" y="2" width="16" height="20" rx="2" stroke="#3801E5" />
                 <Path d="M9 22v-4h6v4" stroke="#3801E5" />
                 <Path d="M8 6h.01 M16 6h.01 M8 10h.01 M16 10h.01 M8 14h.01 M16 14h.01" stroke="#3801E5" strokeWidth="2" strokeLinecap="round" />
@@ -236,7 +236,7 @@ export function Slide2Visual({ activationKey = 0, isVisualReady = false }: Slide
             {/* <BlurView intensity={1000} tint="dark" style={StyleSheet.absoluteFill} /> */}
           {/* </MaskedView> */}
           <BlurView intensity={10} tint="light" style={[styles.badge, { overflow: 'hidden' }]}>
-              <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+              <Svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
                 <Rect x="2" y="4" width="20" height="16" rx="2" stroke="#ffffff" />
                 <Circle cx="8" cy="11" r="3" stroke="#ffffff" />
                 <Path d="M14 10h4 M14 14h4" stroke="#ffffff" />
@@ -279,11 +279,11 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: 32,
+    top: 28,
     right: 22,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -295,19 +295,19 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'flex-start',
-    paddingLeft: 24,
-    paddingTop: 32,
+    paddingLeft: 22,
+    paddingTop: 30,
   },
   value: {
     fontFamily: 'Inter_800ExtraBold',
-    fontSize: 40,
-    lineHeight: 44,
-    letterSpacing: -1.5,
+    fontSize: 34,
+    lineHeight: 38,
+    letterSpacing: 0,
     marginBottom: 4,
   },
   label: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
+    fontSize: 12,
   },
   hint: {
     marginTop: 24,

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
-import { View, StyleSheet, Dimensions, Text, TouchableOpacity, PanResponder } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, PanResponder, useWindowDimensions } from 'react-native';
 import Animated, { 
   useAnimatedStyle, 
   useSharedValue, 
@@ -20,7 +20,6 @@ import { Slide1Visual } from '../../components/onboarding/Slide1Visual';
 import { Slide2Visual } from '../../components/onboarding/Slide2Visual';
 import { Slide3Visual } from '../../components/onboarding/Slide3Visual';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
@@ -73,6 +72,7 @@ export default function OnboardingScreen() {
   const [visualActivationKey, setVisualActivationKey] = useState(0);
   const [isVisualReady, setIsVisualReady] = useState(false);
   const insets = useSafeAreaInsets();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   // Use refs so PanResponder and setTimeout always see the latest values
   const currentIndexRef = useRef(0);
@@ -258,6 +258,17 @@ export default function OnboardingScreen() {
   const SlideVisual = slide.Visual as React.ComponentType<{ activationKey?: number; isVisualReady?: boolean }>;
   const typewriterSpeed = hasEnteredRef.current ? 9 : 14;
   const typewriterEnterDelay = hasEnteredRef.current ? 35 : 80;
+  const isShortScreen = screenHeight < 760;
+  const isVeryShortScreen = screenHeight < 700;
+  const textTopOffset = (isVeryShortScreen ? 26 : isShortScreen ? 36 : 52) + insets.top;
+  const slideTitleStyle = slide.id === 1
+    ? [
+        styles.title,
+        styles.titleLarge,
+        isShortScreen && styles.titleLargeShort,
+        isVeryShortScreen && styles.titleLargeVeryShort,
+      ]
+    : styles.title;
 
   // Animated styles for visual area
   const visualAnimStyle = useAnimatedStyle(() => ({
@@ -278,8 +289,8 @@ export default function OnboardingScreen() {
   const btnStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateX: SCREEN_WIDTH - 128 },
-        { translateY: SCREEN_HEIGHT - 104 - insets.bottom }
+        { translateX: screenWidth - 128 },
+        { translateY: screenHeight - 104 - insets.bottom }
       ]
     };
   });
@@ -290,9 +301,16 @@ export default function OnboardingScreen() {
       <View style={styles.contentArea}>
         {slide.layout === 'text-top' ? (
           <>
-            <View style={[styles.textContainerTop, { marginTop: 60 + insets.top }]}>
+            <View
+              style={[
+                styles.textContainerTop,
+                isShortScreen && styles.textContainerTopCompact,
+                isVeryShortScreen && styles.textContainerTopVeryCompact,
+                { marginTop: textTopOffset },
+              ]}
+            >
               <TypewriterText
-                style={[styles.title, slide.id === 1 && styles.titleLarge]}
+                style={slideTitleStyle}
                 text={slide.title}
                 segments={(slide as any).titleSegments}
                 isActive={!isTransitioning}
@@ -320,7 +338,7 @@ export default function OnboardingScreen() {
             </Animated.View>
             <View style={[styles.textContainerBottom, { paddingBottom: 120 + insets.bottom }]}>
               <TypewriterText
-                style={[styles.title, slide.id === 1 && styles.titleLarge]}
+                style={slideTitleStyle}
                 text={slide.title}
                 segments={(slide as any).titleSegments}
                 isActive={!isTransitioning}
@@ -440,7 +458,15 @@ const styles = StyleSheet.create({
   // -- Slide 1: Text Top --
   textContainerTop: {
     paddingHorizontal: 32,
-    top: 60,
+    top: 48,
+  },
+  textContainerTopCompact: {
+    top: 34,
+    paddingHorizontal: 28,
+  },
+  textContainerTopVeryCompact: {
+    top: 24,
+    paddingHorizontal: 24,
   },
   visualContainerBottom: {
     flex: 1,
@@ -464,11 +490,19 @@ const styles = StyleSheet.create({
     color: '#020805',
     lineHeight: 60,
     marginBottom: 16,
-    letterSpacing: -1,
+    letterSpacing: 0,
   },
   titleLarge: {
-    fontSize: 68,
-    lineHeight: 72,
+    fontSize: 58,
+    lineHeight: 64,
+  },
+  titleLargeShort: {
+    fontSize: 50,
+    lineHeight: 56,
+  },
+  titleLargeVeryShort: {
+    fontSize: 44,
+    lineHeight: 50,
   },
   subtitle: {
     fontFamily: 'Inter_500Medium',
