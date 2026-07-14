@@ -114,8 +114,8 @@ export default function HomeScreen() {
       <View style={{ paddingHorizontal: ds.space.lg, paddingTop: top }}>
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: ds.space.md, marginBottom: ds.space.sm }}>
           <View style={{ flex: 1 }}>
-            <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 18 }}>Welcome Back</BodySmallText>
-            <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 34, marginTop: 4, color: ds.colors.mainText }}>Gracious</BodyLargeText>
+            <BodySmallText style={{ color: ds.colors.secondaryText, fontSize: 16 }}>Welcome Back</BodySmallText>
+            <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 30, marginTop: 4, color: ds.colors.mainText }}>Gracious</BodyLargeText>
           </View>
           <TouchableOpacity style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : ds.colors.white, padding: ds.space.sm, borderRadius: ds.radius.full, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(226, 232, 240, 1)' }} onPress={() => router.push('/(screens)/notifications')}>
             <ASSETS.ICONS.NOTIFICATION_ICON width={24} height={24} />
