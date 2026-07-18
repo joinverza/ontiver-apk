@@ -1,49 +1,15 @@
-import AppButton from "@/components/shared/AppButton"
-import { BodySmallText, H2Text } from "@/components/shared/AppTexts"
-import BackButton from "@/components/shared/BackButton"
-import OtpInput from "@/components/shared/OtpInput"
-import Colors from "@/constants/Colors"
-import { useToast } from "@/context/ToastContext"
-import { useDesignSystem } from "@/utils/design-system"
-import { router } from "expo-router"
-import { useState } from "react"
-import { KeyboardAvoidingView, Text, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
-const VerifyEmail = () => {
-    const ds = useDesignSystem()
-    const toast = useToast()
-    const [countDown, setCountDown] = useState(59)
-    const [code, setCode] = useState("")
-    return (
-        <SafeAreaView style={{ flex: 1, paddingBottom: ds.space.xl, backgroundColor: Colors.white }}>
-            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50} style={{ flex: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <BackButton />
-                    <View style={{ marginVertical: ds.space.lg }}>
-                        <H2Text>Check your email</H2Text>
-                        <BodySmallText color={Colors.black}>
-                            We sent a reset link to alpha...@gmail.com
-                            enter 6 digit code that mentioned in the email
-                        </BodySmallText>
-                    </View>
-                    <OtpInput
-                        code={code}
-                        setCode={setCode}
-                        isSecure={false}
-                        length={6}
-                        inputStyle={{
+import AppButton from '@/components/shared/AppButton';
+import AppInput from '@/components/shared/AppInput';
+import { Colors } from '@/constants/Colors';
+import { resetPassword } from '@/lib/auth-public-api';
 
-                        }}
-                    />
-                </View>
-                <AppButton title="Verify Code" onPress={() => router.push("/auth/account-recovery/enter-recovery-code")} />
-                <BodySmallText size={12} style={{ textAlign: "center", paddingVertical: ds.space.md }}>
-                    Haven’t got the email yet? <Text style={{ color: "#648DDB" }}>Resend code in 00:34</Text>
-                </BodySmallText>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    )
+export default function ResetPasswordScreen() {
+  const router = useRouter(); const params = useLocalSearchParams<{ email?: string; token?: string }>(); const [token, setToken] = useState(params.token ?? ''); const [password, setPassword] = useState(''); const [confirm, setConfirm] = useState(''); const [mfaCode, setMfaCode] = useState(''); const [recoveryCode, setRecoveryCode] = useState(''); const [error, setError] = useState<string | null>(null); const [loading, setLoading] = useState(false);
+  const submit = async () => { setLoading(true); setError(null); try { if (password !== confirm) throw new Error('Passwords do not match.'); await resetPassword({ token, newPassword: password, mfaCode: mfaCode || undefined, recoveryCode: recoveryCode || undefined }); router.replace('/auth/account-recovery/success'); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Password could not be reset.'); } finally { setLoading(false); } };
+  return <View style={styles.page}><Text style={styles.heading}>Choose a new password</Text><Text style={styles.copy}>Open the verified-email reset link, or paste its token. If MFA is required, use an authenticator code or one of your existing recovery codes.</Text><AppInput label="Reset token" value={token} onChangeText={setToken} autoCapitalize="none" /><AppInput label="New password" value={password} onChangeText={setPassword} isPassword /><AppInput label="Confirm password" value={confirm} onChangeText={setConfirm} isPassword /><AppInput label="Authenticator code (if required)" value={mfaCode} onChangeText={setMfaCode} keyboardType="number-pad" /><AppInput label="MFA recovery code (alternative)" value={recoveryCode} onChangeText={setRecoveryCode} autoCapitalize="characters" />{error ? <Text style={styles.error}>{error}</Text> : null}<AppButton title="Reset password" loading={loading} disabled={!token || password.length < 12 || !confirm} onPress={() => void submit()} /></View>;
 }
-
-export default VerifyEmail
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 64, gap: 14 }, heading: { color: Colors.mainText, fontSize: 28, fontWeight: '800' }, copy: { color: Colors.secondaryText, lineHeight: 21 }, error: { color: '#B42318' } });

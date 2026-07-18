@@ -6,9 +6,12 @@ import { router } from "expo-router"
 import * as LocalAuthentication from 'expo-local-authentication';
 import { TouchableOpacity, View, Alert } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { useAuthStore } from '@/store/authStore';
 
 const BiometricAuth = () => {
     const ds = useDesignSystem()
+    const user = useAuthStore((state) => state.user)
+    const unlock = useAuthStore((state) => state.unlock)
 
     const handleBiometricAuth = async () => {
         const hasHardware = await LocalAuthentication.hasHardwareAsync();
@@ -21,6 +24,7 @@ const BiometricAuth = () => {
             });
 
             if (result.success) {
+                unlock();
                 router.replace("/(tabs)");
             }
         } else {
@@ -34,7 +38,7 @@ const BiometricAuth = () => {
         >
             <View style={{ padding: ds.space.xl, gap: ds.space.sm }}>
                 <H2Text color={Colors.white}>Welcome back,</H2Text>
-                <DisplayText color={Colors.white}>Chris Doe</DisplayText>
+                <DisplayText color={Colors.white}>{user?.fullName || 'Welcome back'}</DisplayText>
                 <BodyLargeText color={Colors.white}>Use your biometric to access your vault.</BodyLargeText>
             </View>
             <View

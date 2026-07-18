@@ -1,50 +1,9 @@
-import AppButton from '@/components/shared/AppButton';
-import { BodySmallText, H2Text } from '@/components/shared/AppTexts';
-import Colors from '@/constants/Colors';
-import { ASSETS } from '@/utils/assets';
-import { useDesignSystem } from '@/utils/design-system';
-import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
+import { Link } from 'expo-router';
 
-export default function Success() {
-    const router = useRouter();
-    const ds = useDesignSystem();
+import { Colors } from '@/constants/Colors';
 
-    return (
-        <SafeAreaView style={{ flex: 1, paddingBottom: ds.space.xl, backgroundColor: Colors.white }}>
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    paddingHorizontal: ds.space.xl,
-                    gap: ds.space.xl
-                }}
-            >
-                <ASSETS.AUTH.VERIFICATION_SUCCESS
-                    width={ds.width * 0.4}
-                    height={ds.width * 0.4}
-                />
-                <View style={{ gap: ds.space.md }}>
-                    <H2Text style={{ textAlign: "center" }}>
-                        Account Restored!
-                    </H2Text>
-                    <BodySmallText style={{ textAlign: "center" }}>
-                        Your Ontiver account and credentials{"\n"}have been fully restored.{"\n\n"}Your privacy score and activity log are intact.
-                    </BodySmallText>
-                </View>
-                <AppButton
-                    title='Go to my Vault'
-                    onPress={() => router.push("/(tabs)")}
-                />
-            </View>
-        </SafeAreaView>
-    );
+export default function RecoverySuccessScreen() {
+  return <View style={styles.page}><Text style={styles.heading}>Password updated</Text><Text style={styles.copy}>Sign in with your new password. Other recovery and MFA steps remain controlled by the backend.</Text><Link href="/auth/login" style={styles.link}>Return to login</Link></View>;
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});
+const styles = StyleSheet.create({ page: { flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16, backgroundColor: '#fff' }, heading: { color: Colors.mainText, fontSize: 26, fontWeight: '800' }, copy: { color: Colors.secondaryText, textAlign: 'center', lineHeight: 22 }, link: { color: Colors.primary, fontWeight: '800' } });

@@ -1,4 +1,5 @@
-import { ActivityIndicator, StyleSheet, TextStyle, TouchableOpacity, type TouchableOpacityProps, type ViewStyle } from 'react-native';
+import type { ReactNode } from 'react';
+import { ActivityIndicator, StyleSheet, TextStyle, TouchableOpacity, View, type TouchableOpacityProps, type ViewStyle } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useDesignSystem } from '../../utils/design-system';
 import { ButtonText } from './AppTexts';
@@ -9,10 +10,11 @@ export type AppButtonProps = TouchableOpacityProps & {
   variant?: 'primary' | 'secondary' | 'outline';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  leftIcon?: ReactNode;
   onPress?: () => void
 };
 
-export function AppButton({ title, loading, variant = 'primary', style, disabled, onPress, textStyle, ...props }: AppButtonProps) {
+export function AppButton({ title, loading, variant = 'primary', style, disabled, onPress, textStyle, leftIcon, ...props }: AppButtonProps) {
   const ds = useDesignSystem();
 
   const getBackgroundColor = () => {
@@ -56,9 +58,10 @@ export function AppButton({ title, loading, variant = 'primary', style, disabled
       {loading ? (
         <ActivityIndicator color={getTextColor()} />
       ) : (
-        <ButtonText color={getTextColor()} style={[styles.text, textStyle]}>
-          {title}
-        </ButtonText>
+        <View style={styles.content}>
+          {leftIcon}
+          <ButtonText color={getTextColor()} style={[styles.text, textStyle]}>{title}</ButtonText>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -78,11 +81,8 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center"
   },
+  content: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
 });
 
 export default AppButton;

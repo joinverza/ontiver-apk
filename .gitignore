@@ -1,41 +1,41 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# npm is the only supported package manager for this repository.
 node_modules/
+.npm-cache/
+pnpm-lock.yaml
+.pnpm-store/
 
-# Expo
+# Expo generated output
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-
-# Native
 .kotlin/
+/ios/
+/android/
+*.tsbuildinfo
+.metro-health-check*
+
+# Native signing and EAS/SmileID file secrets
 *.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.pem
+smile_config.json
+**/smile_config.json
 
-# Metro
-.metro-health-check*
+# Local environment files
+.env
+.env.*
+!.env.example
 
-# debug
+# Logs and operating-system artifacts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-
-# macOS
 .DS_Store
-*.pem
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android
+# IDE metadata
+.idea/

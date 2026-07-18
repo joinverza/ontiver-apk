@@ -1,104 +1,15 @@
-import AppButton from '@/components/shared/AppButton';
-import { BodySmallText, H2Text } from '@/components/shared/AppTexts';
-import BackButton from '@/components/shared/BackButton';
-import OtpInput from '@/components/shared/OtpInput';
-import Colors from '@/constants/Colors';
-import { useToast } from '@/context/ToastContext';
-import { ASSETS } from '@/utils/assets';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDesignSystem } from '../../utils/design-system';
+import { StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+
+import AppButton from '@/components/shared/AppButton';
+import AppInput from '@/components/shared/AppInput';
+import { Colors } from '@/constants/Colors';
+import { resendSignupEmail, verifySignupEmail } from '@/lib/auth-public-api';
 
 export default function VerifyEmailScreen() {
-  const router = useRouter();
-  const ds = useDesignSystem();
-  const toast = useToast();
-  const [countDown, setCountDown] = useState(59)
-  const [code, setCode] = useState('');
-
-  return (
-    <SafeAreaView style={{ flex: 1, paddingBottom: ds.space.xl, backgroundColor: Colors.white }}>
-      <KeyboardAvoidingView style={{
-        flex: 1,
-        padding: ds.space.xl,
-        paddingTop: ds.space.xl,
-      }}
-        // keyboardVerticalOffset={100}
-        behavior='height'
-      >
-
-        <View style={{ flex: 1, gap: ds.space['2xl'] }}>
-          <BackButton />
-
-          <ASSETS.AUTH.MAIL_SVG
-            width={ds.width * 0.9}
-            height={150}
-          />
-          <View
-            style={{ paddingHorizontal: ds.space.xl, gap: ds.space.md }}
-          >
-            <H2Text style={{ textAlign: "center" }}>
-              Check Your Email
-            </H2Text>
-            <BodySmallText
-              style={{ textAlign: "center" }}
-            >
-              We sent a 6-digit code to designerslive@gmail.com. It expires in 10 minutes
-            </BodySmallText>
-          </View>
-
-          <OtpInput
-            length={6}
-            code={code}
-            setCode={setCode}
-            inputContainerStyle={{
-              backgroundColor: "transparent"
-            }}
-            inputStyle={{
-            }}
-            isSecure
-          />
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: ds.space.sm
-            }}
-          >
-            <AntDesign name="clock-circle" size={16} color="#919191" />
-            <BodySmallText
-              color='#919191'
-            >
-              00:{countDown}
-            </BodySmallText>
-
-          </View>
-
-          <BodySmallText
-            color='#919191'
-            style={{ textAlign: "center" }}
-            onPress={() => toast.showToast({ message: "Success", type: "success" })}
-          >
-            Didn't get the code? Resend
-          </BodySmallText>
-        </View>
-        <AppButton
-          title='Verify Code'
-          disabled={code.length !== 6}
-          onPress={() => router.push("/auth/verification-success")}
-        />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+  const router = useRouter(); const { email = '' } = useLocalSearchParams<{ email: string }>(); const [code, setCode] = useState(''); const [error, setError] = useState<string | null>(null); const [loading, setLoading] = useState(false);
+  const verify = async () => { setLoading(true); setError(null); try { await verifySignupEmail(email, code); router.replace('/auth/login'); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Code could not be verified.'); } finally { setLoading(false); } };
+  return <View style={styles.page}><Text style={styles.heading}>Verify your email</Text><Text style={styles.copy}>Enter the six-digit code sent to {email || 'your account email'}.</Text><AppInput label="Verification code" value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} />{error ? <Text style={styles.error}>{error}</Text> : null}<AppButton title="Verify email" loading={loading} disabled={code.length !== 6 || !email} onPress={() => void verify()} /><Text style={styles.link} onPress={() => void resendSignupEmail(email)}>Resend code</Text></View>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 80, gap: 18 }, heading: { color: Colors.mainText, fontSize: 28, fontWeight: '800' }, copy: { color: Colors.secondaryText }, error: { color: '#B42318' }, link: { color: Colors.primary, fontWeight: '800', textAlign: 'center' } });
