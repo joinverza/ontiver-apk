@@ -11,7 +11,9 @@ if (appEnvironment === 'production' && !process.env.GOOGLE_SERVICE_INFO_PLIST &&
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Ontiver',
-  slug: 'ontiver',
+  // This must match the slug registered for the EAS project ID below.
+  // It does not control the App Store or Play Store application identifiers.
+  slug: 'ontiver-apk',
   version: '1.0.0',
   owner: 'ontiverhq',
   orientation: 'portrait',
