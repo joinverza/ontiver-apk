@@ -32,4 +32,5 @@ export const legalUrls = {
   terms: `${runtimeConfig.websiteUrl.replace(/\/$/, '')}/terms`,
   cookies: `${runtimeConfig.websiteUrl.replace(/\/$/, '')}/cookies`,
   accountDeletion: `${runtimeConfig.websiteUrl.replace(/\/$/, '')}/account-deletion`,
+  support: `${runtimeConfig.websiteUrl.replace(/\/$/, '')}/support`,
 };

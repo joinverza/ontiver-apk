@@ -138,6 +138,11 @@ export default function HelpSupportScreen() {
                         <BodyLargeText style={{ color: '#111827', marginLeft: ds.space.md }}>Submit Feedback</BodyLargeText>
                     </TouchableOpacity>
 
+                    <TouchableOpacity style={styles.linkCard} onPress={() => void Linking.openURL(legalUrls.support)}>
+                        <Feather name="external-link" size={20} color="#111827" />
+                        <BodyLargeText style={{ color: '#111827', marginLeft: ds.space.md }}>Open Public Support Centre</BodyLargeText>
+                    </TouchableOpacity>
+
                     <TouchableOpacity style={styles.linkCard} onPress={() => void Linking.openURL(legalUrls.legal)}>
                         <Feather name="info" size={20} color="#111827" />
                         <BodyLargeText style={{ color: '#111827', marginLeft: ds.space.md }}>Privacy Policy / Terms</BodyLargeText>
