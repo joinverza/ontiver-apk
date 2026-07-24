@@ -1,8 +1,10 @@
 import * as SecureStore from 'expo-secure-store';
+import * as Crypto from 'expo-crypto';
 import { z } from 'zod';
 
 const REFRESH_TOKEN_KEY = 'ontiver.auth.refresh-token.v1';
 const APP_LOCK_VERIFIER_KEY = 'ontiver.app-lock.verifier.v1';
+const DEVICE_BINDING_KEY = 'ontiver.handoff.device-binding.v1';
 
 export const UserSchema = z.object({
   id: z.string(),
@@ -51,4 +53,14 @@ export async function getAppLockVerifier(): Promise<string | null> {
 
 export async function clearAppLockVerifier(): Promise<void> {
   await SecureStore.deleteItemAsync(APP_LOCK_VERIFIER_KEY);
+}
+
+export async function getOrCreateDeviceBinding(): Promise<string> {
+  const existing = await SecureStore.getItemAsync(DEVICE_BINDING_KEY);
+  if (existing) return existing;
+  const generated = `device_${Crypto.randomUUID()}_${Crypto.randomUUID()}`;
+  await SecureStore.setItemAsync(DEVICE_BINDING_KEY, generated, {
+    keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  });
+  return generated;
 }

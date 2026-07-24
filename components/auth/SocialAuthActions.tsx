@@ -9,7 +9,15 @@ import type { SocialMode, SocialProvider } from '@/lib/social-auth';
 import { SocialAuthCancelledError } from '@/lib/social-auth';
 import { useAuthStore } from '@/store/authStore';
 
-export function SocialAuthActions({ mode, consentAccepted = true }: { mode: SocialMode; consentAccepted?: boolean }) {
+export function SocialAuthActions({
+  mode,
+  consentAccepted = true,
+  onSuccess,
+}: {
+  mode: SocialMode;
+  consentAccepted?: boolean;
+  onSuccess?: () => void | Promise<void>;
+}) {
   const socialLogin = useAuthStore((state) => state.socialLogin);
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(null);
   const disabled = activeProvider !== null || (mode === 'signup' && !consentAccepted);
@@ -18,6 +26,7 @@ export function SocialAuthActions({ mode, consentAccepted = true }: { mode: Soci
     setActiveProvider(provider);
     try {
       await socialLogin(provider, mode, consentAccepted);
+      await onSuccess?.();
     } catch (error) {
       if (!(error instanceof SocialAuthCancelledError)) throw error;
     } finally {

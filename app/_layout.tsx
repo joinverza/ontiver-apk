@@ -48,6 +48,7 @@ function Navigation() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="continue" />
       <Stack.Protected guard={status === 'anonymous'}>
         <Stack.Screen name="auth" />
       </Stack.Protected>

@@ -24,6 +24,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier: 'com.ontiverhq.ontiver',
     usesAppleSignIn: true,
+    associatedDomains: ['applinks:links.ontiver.com'],
     googleServicesFile: process.env.GOOGLE_SERVICE_INFO_PLIST,
     infoPlist: {
       NSFaceIDUsageDescription: 'Use Face ID only to unlock your Ontiver app on this device.',
@@ -33,6 +34,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.ontiverhq.ontiver',
     googleServicesFile: process.env.GOOGLE_SERVICES_JSON,
     predictiveBackGestureEnabled: false,
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [
+          {
+            scheme: 'https',
+            host: 'links.ontiver.com',
+            pathPrefix: '/continue',
+          },
+        ],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/images/android-icon-foreground.png',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 
 import AppButton from '@/components/shared/AppButton';
 import AppInput from '@/components/shared/AppInput';
@@ -12,6 +12,8 @@ import { useAuthStore } from '@/store/authStore';
 import { useDesignSystem } from '@/utils/design-system';
 
 export default function LoginScreen() {
+  const router = useRouter();
+  const { resumeHandoff = '' } = useLocalSearchParams<{ resumeHandoff?: string }>();
   const ds = useDesignSystem();
   const login = useAuthStore((state) => state.login);
   const error = useAuthStore((state) => state.lastError);
@@ -19,10 +21,17 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  const resumeIfNeeded = () => {
+    if (resumeHandoff.startsWith('handoff_') && resumeHandoff.length <= 200) {
+      router.replace({ pathname: '/continue', params: { handoff: resumeHandoff } } as never);
+    }
+  };
+
   const submit = async () => {
     setSubmitting(true);
     try {
       await login(email, password);
+      resumeIfNeeded();
     } finally {
       setSubmitting(false);
     }
@@ -56,7 +65,7 @@ export default function LoginScreen() {
             onPress={() => void submit()}
             disabled={submitting || !email.trim() || !password}
           />
-          <SocialAuthActions mode="login" />
+          <SocialAuthActions mode="login" onSuccess={resumeIfNeeded} />
           <Link href="/auth/account-recovery/enter-email" asChild>
             <BodySmallText color={Colors.primary} style={{ textAlign: 'center' }}>Forgot password?</BodySmallText>
           </Link>
