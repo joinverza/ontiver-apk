@@ -11,6 +11,7 @@ import { Colors } from '../../constants/Colors';
 import { useTheme } from '../../context/ThemeContext';
 import { useDesignSystem } from '../../utils/design-system';
 import { getFloatingTabBarContentPadding } from '../../utils/responsive-spacing';
+import { useAuthStore } from '@/store/authStore';
 
 function ListRow({
   title,
@@ -104,6 +105,7 @@ function PlainListSection({
 
 function SettingsProfileCard() {
   const ds = useDesignSystem();
+  const user = useAuthStore((state) => state.user);
 
   return (
     <View
@@ -119,15 +121,15 @@ function SettingsProfileCard() {
       }}
     >
       <Image
-        source={ASSETS.IMAGES.PROFILE_IMG}
+        source={user?.avatarUrl ? { uri: user.avatarUrl } : ASSETS.IMAGES.PROFILE_IMG}
         style={{ width: 64, height: 64, borderRadius: ds.radius.full, borderWidth: 1, borderColor: '#F3F4F6' }}
       />
       <View style={{ flex: 1, gap: ds.space.xs }}>
-        <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 18, color: '#05150E' }}>Nathan Adeyemi</BodyLargeText>
-        <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.52)', fontSize: 13, marginBottom: ds.space.xs }}>nathan.adeyemi@gmail.com</BodySmallText>
+        <BodyLargeText style={{ fontFamily: Fonts.bold, fontSize: 18, color: '#05150E' }}>{user?.fullName || 'Ontiver user'}</BodyLargeText>
+        <BodySmallText style={{ color: 'rgba(5, 21, 14, 0.52)', fontSize: 13, marginBottom: ds.space.xs }}>{user?.email || ''}</BodySmallText>
         <AppButton
           title='Edit Profile'
-          onPress={() => router.push("/settings/account")}
+          onPress={() => router.push("/settings/profile" as any)}
           style={{ alignSelf: "flex-start", backgroundColor: "#ECFDF3", borderColor: "transparent", borderWidth: 0, height: 32, paddingTop: 2, borderRadius: ds.radius.full, paddingHorizontal: 16 }}
           textStyle={{ fontSize: 12, color: "#166534", fontFamily: Fonts.bold }}
         />
@@ -143,9 +145,15 @@ export default function SettingsScreen() {
   const ds = useDesignSystem();
   const { top, bottom } = useSafeAreaInsets();
   const { isDark, setTheme } = useTheme();
+  const logout = useAuthStore((state) => state.logout);
   const tabSafePadding = getFloatingTabBarContentPadding(bottom, ds.space['5xl']);
 
   const accountActions = [
+    {
+      title: "Account & sign-in",
+      icon: "user" as const,
+      route: "/settings/account" as const,
+    },
     {
       title: "Security",
       icon: "shield" as const,
@@ -185,7 +193,7 @@ export default function SettingsScreen() {
     {
       title: "About",
       icon: "info" as const,
-      route: "/" as const,
+      route: "/settings/about" as const,
     },
   ];
 
@@ -263,7 +271,7 @@ export default function SettingsScreen() {
             title='Sign Out'
             textStyle={{ color: "rgba(156, 0, 0, 1)", fontFamily: Fonts.bold }}
             style={{ backgroundColor: "rgba(255, 219, 219, 0.4)", borderRadius: ds.radius.xl, borderWidth: 0 }}
-            onPress={() => router.replace("/auth/splash" as any)}
+            onPress={() => void logout()}
           />
         </Animated.View>
       </ScrollView>

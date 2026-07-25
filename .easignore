@@ -1,0 +1,11 @@
+node_modules/
+.expo/
+.npm-cache/
+.env*
+smile_config.json
+*.mobileprovision
+*.p8
+*.p12
+*.jks
+package.sdk54.json
+eas.sdk54.json

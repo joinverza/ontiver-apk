@@ -1,24 +1,31 @@
-import AppButton from "@/components/shared/AppButton"
 import { BodyLargeText, BodySmallText, DisplayText, H2Text } from "@/components/shared/AppTexts"
-import OtpInput from "@/components/shared/OtpInput"
 import Colors from "@/constants/Colors"
 import { useDesignSystem } from "@/utils/design-system"
 import { router } from "expo-router"
-import { useState } from "react"
+import * as LocalAuthentication from 'expo-local-authentication'
 import { KeyboardAvoidingView, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { useAuthStore } from '@/store/authStore'
 
 const BiometricAuth = () => {
     const ds = useDesignSystem()
-    const [code, setCode] = useState("")
+    const user = useAuthStore((state) => state.user)
+    const unlock = useAuthStore((state) => state.unlock)
+    const authenticate = async () => {
+        const result = await LocalAuthentication.authenticateAsync({ promptMessage: 'Unlock Ontiver', fallbackLabel: 'Use device passcode', disableDeviceFallback: false })
+        if (result.success) {
+            unlock()
+            router.replace('/(tabs)')
+        }
+    }
     return (
         <SafeAreaView
             style={{ flex: 1, backgroundColor: Colors.primary }}
         >
             <View style={{ padding: ds.space.xl, gap: ds.space.sm }}>
                 <H2Text color={Colors.white}>Welcome back,</H2Text>
-                <DisplayText color={Colors.white}>Chris Doe</DisplayText>
-                <BodyLargeText color={Colors.white}>Use your biometric to access your vault.</BodyLargeText>
+                <DisplayText color={Colors.white}>{user?.fullName || 'Welcome back'}</DisplayText>
+                <BodyLargeText color={Colors.white}>Use your device security to access your vault.</BodyLargeText>
             </View>
             <KeyboardAvoidingView
                 style={{
@@ -33,16 +40,9 @@ const BiometricAuth = () => {
                 behavior="padding"
                 keyboardVerticalOffset={50}
             >
-                <OtpInput
-                    code={code}
-                    setCode={setCode}
-                    length={6}
-                    isSecure
-                />
-                <AppButton
-                    title="Continue"
-                    onPress={() => router.push("/(tabs)")}
-                />
+                <TouchableOpacity onPress={() => void authenticate()}>
+                    <BodyLargeText style={{ textAlign: 'center' }}>Unlock with device security</BodyLargeText>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push("/auth/account-recovery")}>
                     <BodySmallText style={{ textAlign: "center" }} color="rgba(5, 21, 14, 0.4)">
                         Forgot PIN or lost device?

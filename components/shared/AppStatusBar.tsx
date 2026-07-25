@@ -73,7 +73,7 @@ export function AppStatusBar() {
     }
   }, [backgroundColor, style]);
 
-  return <StatusBar animated={false} backgroundColor={backgroundColor} style={style} translucent={false} />;
+  return <StatusBar animated={false} style={style} />;
 }
 
 export default AppStatusBar;

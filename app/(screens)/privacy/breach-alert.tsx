@@ -1,72 +1,12 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { H2Text, BodyLargeText } from '@/components/shared/AppTexts';
-import Colors from '@/constants/Colors';
-import { useDesignSystem } from '@/utils/design-system';
-import AppHeader from '@/components/shared/AppHeader';
-import AppButton from '@/components/shared/AppButton';
+import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 
-export default function BreachAlert() {
-    const ds = useDesignSystem();
+import { RemoteState } from '@/components/shared/RemoteState';
+import { Colors } from '@/constants/Colors';
+import { getPrivacyOverview } from '@/lib/wallet-api';
 
-    return (
-        <SafeAreaView style={[styles.container, { backgroundColor: Colors.white }]}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: ds.space['4xl'] }}>
-                
-                <View style={{ paddingHorizontal: ds.space.xl, marginTop: ds.space.md }}>
-                    <AppHeader title="Who Has Your Data" />
-                </View>
-
-                <View style={styles.content}>
-                    
-                    <View style={styles.iconContainer}>
-                        <View style={styles.alertIcon}>
-                            <H2Text style={{ color: '#FF3B30', fontSize: 48, fontWeight: 'bold' }}>!</H2Text>
-                        </View>
-                    </View>
-
-                    <H2Text style={{ marginTop: ds.space['2xl'], textAlign: 'center' }}>Data Breach Alert</H2Text>
-                    <BodyLargeText style={{ color: Colors.grey200, marginTop: ds.space.sm, textAlign: 'center', paddingHorizontal: ds.space.xl }}>
-                        We detected a potential data breach affecting your information. Please take immediate action to secure your accounts.
-                    </BodyLargeText>
-
-                    <View style={{ width: '100%', marginTop: 60 }}>
-                        <AppButton 
-                            title="Okay" 
-                            style={{ backgroundColor: Colors.black }}
-                            textStyle={{ color: Colors.white }}
-                            onPress={() => {}}
-                        />
-                    </View>
-                </View>
-
-            </ScrollView>
-        </SafeAreaView>
-    );
+export default function ConfirmedAlertsScreen() {
+  const query = useQuery({ queryKey: ['privacy-overview'], queryFn: getPrivacyOverview });
+  return <View style={styles.page}><Text style={styles.heading}>Confirmed security alerts</Text><Text style={styles.copy}>Only evidence-confirmed Ontiver incidents linked to your account appear here.</Text><RemoteState loading={query.isLoading} error={query.error as Error | null} empty={!query.data?.confirmedAlerts.length} onRetry={() => void query.refetch()}><FlatList data={query.data?.confirmedAlerts ?? []} keyExtractor={(item) => item.id} refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} />} contentContainerStyle={styles.list} renderItem={({ item }) => <View style={styles.alert}><Text style={styles.title}>{item.type}</Text><Text style={styles.copy}>{item.status} · {new Date(item.createdAt).toLocaleString()}</Text></View>} /></RemoteState></View>;
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    content: {
-        paddingHorizontal: 24,
-        marginTop: 60,
-        alignItems: 'center',
-    },
-    iconContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    alertIcon: {
-        width: 100,
-        height: 100,
-        backgroundColor: 'rgba(255, 59, 48, 0.1)',
-        borderRadius: 50,
-        borderWidth: 4,
-        borderColor: '#FF3B30',
-        justifyContent: 'center',
-        alignItems: 'center',
-    }
-});
+const styles = StyleSheet.create({ page: { flex: 1, paddingTop: 64, backgroundColor: '#F6F8F6' }, heading: { paddingHorizontal: 20, color: Colors.mainText, fontSize: 28, fontWeight: '800' }, copy: { paddingHorizontal: 20, marginTop: 8, color: Colors.secondaryText }, list: { padding: 20, gap: 12 }, alert: { backgroundColor: '#FFF1F0', borderRadius: 16, padding: 18 }, title: { color: Colors.mainText, fontWeight: '800' } });

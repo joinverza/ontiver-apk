@@ -813,7 +813,11 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(0,0,0,0.08)',
     zIndex: 1,
   },
@@ -896,7 +900,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: TAB_BAR_SIDE_INSET + TAB_BAR_INNER_PADDING,
   },
   tabBarOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'transparent',
   },
   activeUnderlineSlot: {

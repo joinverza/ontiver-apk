@@ -1,119 +1,15 @@
-import React from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { H2Text, BodySmallText, BodyLargeText } from '@/components/shared/AppTexts';
-import Colors from '@/constants/Colors';
-import { ASSETS } from '@/utils/assets';
-import { useDesignSystem } from '@/utils/design-system';
-import AppHeader from '@/components/shared/AppHeader';
-import AppInput from '@/components/shared/AppInput';
+import { Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-const dataItems = [
-    { id: '1', appName: 'PayStack', subtitle: 'Requested to access your profile details', status: 'Active', icon: 'P', color: '#00C3F8' },
-    { id: '2', appName: 'Netflix', subtitle: 'Access revoked', status: 'Revoked', icon: 'N', color: '#E50914' },
-    { id: '3', appName: 'Airbnb', subtitle: 'Requested to access your profile details', status: 'Active', icon: 'A', color: '#FF5A5F' },
-];
+import { RemoteState } from '@/components/shared/RemoteState';
+import { Colors } from '@/constants/Colors';
+import { getWallet, setConnectedAppStatus } from '@/lib/wallet-api';
 
-export default function WhoHasData() {
-    const ds = useDesignSystem();
-
-    return (
-        <SafeAreaView style={[styles.container, { backgroundColor: Colors.white }]}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: ds.space['4xl'] }}>
-                
-                <View style={{ paddingHorizontal: ds.space.xl, marginTop: ds.space.md }}>
-                    <AppHeader title="Who Has Your Data" />
-                </View>
-
-                <View style={{ paddingHorizontal: ds.space.xl, marginTop: ds.space.lg }}>
-                    {/* Search Bar Placeholder */}
-                    <View style={styles.searchContainer}>
-                        <Ionicons name="search" size={18} color={Colors.grey200} />
-                        <BodySmallText style={{ color: Colors.grey200, marginLeft: 8 }}>Search app...</BodySmallText>
-                    </View>
-
-                    <View style={{ marginTop: ds.space.xl, gap: ds.space.lg }}>
-                        {dataItems.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.appRow}>
-                                <View style={styles.rowTop}>
-                                    <View style={[styles.appIcon, { backgroundColor: item.color }]}>
-                                        <BodyLargeText style={{ color: Colors.white, fontFamily: 'bold' }}>{item.icon}</BodyLargeText>
-                                    </View>
-                                    <View style={styles.appInfo}>
-                                        <BodyLargeText style={{ fontFamily: 'bold' }}>{item.appName}</BodyLargeText>
-                                        <BodySmallText style={{ color: Colors.grey200, fontSize: 12 }}>{item.subtitle}</BodySmallText>
-                                    </View>
-                                </View>
-                                <View style={[
-                                    styles.statusTag, 
-                                    item.status === 'Active' ? styles.statusActive : styles.statusRevoked
-                                ]}>
-                                    <BodySmallText style={{ 
-                                        color: item.status === 'Active' ? '#00D150' : '#FF3B30', 
-                                        fontFamily: 'bold',
-                                        fontSize: 12
-                                    }}>
-                                        {item.status}
-                                    </BodySmallText>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
-
-            </ScrollView>
-        </SafeAreaView>
-    );
+export default function WhoHasDataScreen() {
+  const client = useQueryClient();
+  const query = useQuery({ queryKey: ['wallet'], queryFn: getWallet });
+  const update = useMutation({ mutationFn: ({ id, status }: { id: string; status: 'active' | 'paused' }) => setConnectedAppStatus(id, status), onSuccess: () => client.invalidateQueries({ queryKey: ['wallet'] }), onError: (error) => Alert.alert('Could not update access', error.message) });
+  return <View style={styles.page}><Text style={styles.heading}>Who has my data</Text><RemoteState loading={query.isLoading} error={query.error as Error | null} empty={!query.data?.connectedApps.length} onRetry={() => void query.refetch()}><FlatList data={query.data?.connectedApps ?? []} keyExtractor={(item) => item.id} refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} />} contentContainerStyle={styles.list} renderItem={({ item }) => <View style={styles.card}><Text style={styles.title}>{item.name}</Text><Text style={styles.copy}>{item.scopes.join(', ') || 'No active scopes listed'}</Text><Pressable style={styles.button} onPress={() => update.mutate({ id: item.id, status: item.status === 'active' ? 'paused' : 'active' })}><Text style={styles.buttonText}>{item.status === 'active' ? 'Pause access' : 'Restore access'}</Text></Pressable></View>} /></RemoteState></View>;
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    searchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        paddingHorizontal: 12,
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
-    },
-    appRow: {
-        backgroundColor: Colors.white,
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
-        borderRadius: 16,
-        padding: 16,
-    },
-    rowTop: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    appIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    appInfo: {
-        flex: 1,
-    },
-    statusTag: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-    },
-    statusActive: {
-        backgroundColor: 'rgba(0, 209, 80, 0.1)',
-    },
-    statusRevoked: {
-        backgroundColor: 'rgba(255, 59, 48, 0.1)',
-    }
-});
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: '#F6F8F6', paddingTop: 64 }, heading: { paddingHorizontal: 20, fontSize: 28, fontWeight: '800', color: Colors.mainText }, list: { padding: 20, gap: 12 }, card: { backgroundColor: '#fff', padding: 18, borderRadius: 16, gap: 10 }, title: { color: Colors.mainText, fontWeight: '700' }, copy: { color: Colors.secondaryText }, button: { alignSelf: 'flex-start', backgroundColor: '#ECFDF3', padding: 10, borderRadius: 10 }, buttonText: { color: Colors.primary, fontWeight: '700' } });

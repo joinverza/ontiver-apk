@@ -1,40 +1,15 @@
-import AppButton from "@/components/shared/AppButton"
-import AppInput from "@/components/shared/AppInput"
-import { BodySmallText, H2Text } from "@/components/shared/AppTexts"
-import BackButton from "@/components/shared/BackButton"
-import Colors from "@/constants/Colors"
-import { useDesignSystem } from "@/utils/design-system"
-import { router } from "expo-router"
-import { useState } from "react"
-import { KeyboardAvoidingView, View, Platform } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
-const EnterEmail = () => {
-    const [email, setEmail] = useState("")
-    const ds = useDesignSystem()
-    return (
-        <SafeAreaView style={{ flex: 1, paddingBottom: ds.space.xl, backgroundColor: Colors.white }}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} style={{ flex: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <BackButton />
-                    <View style={{ marginBottom: ds.space.lg }}>
-                        <H2Text>Enter Your Email</H2Text>
-                        <BodySmallText color={Colors.black}>
-                            We'll send you a recovery code to reset your password.
-                        </BodySmallText>
-                    </View>
-                    <AppInput
-                        keyboardType="email-address"
-                        placeholder="Email Address"
-                        placeholderTextColor={Colors.grey200}
-                        value={email}
-                        onChangeText={setEmail}
-                    />
-                </View>
-                <AppButton title="Continue" onPress={() => router.push("/auth/account-recovery/verify-email")} />
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    )
+import AppButton from '@/components/shared/AppButton';
+import AppInput from '@/components/shared/AppInput';
+import { Colors } from '@/constants/Colors';
+import { forgotPassword } from '@/lib/auth-public-api';
+
+export default function ForgotPasswordScreen() {
+  const router = useRouter(); const [email, setEmail] = useState(''); const [error, setError] = useState<string | null>(null); const [loading, setLoading] = useState(false);
+  const submit = async () => { setLoading(true); setError(null); try { await forgotPassword(email); router.push({ pathname: '/auth/account-recovery/verify-email', params: { email } }); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Request could not be sent.'); } finally { setLoading(false); } };
+  return <View style={styles.page}><Text style={styles.heading}>Reset password</Text><Text style={styles.copy}>We will send a reset link to the verified account email if the account exists.</Text><AppInput label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />{error ? <Text style={styles.error}>{error}</Text> : null}<AppButton title="Send reset email" loading={loading} disabled={!email} onPress={() => void submit()} /></View>;
 }
-
-export default EnterEmail
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 80, gap: 18 }, heading: { color: Colors.mainText, fontSize: 28, fontWeight: '800' }, copy: { color: Colors.secondaryText, lineHeight: 22 }, error: { color: '#B42318' } });
